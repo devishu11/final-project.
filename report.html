@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Project Report — HealthQ</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Urbanist:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#04060f;
+  --lime:#b9ff66;
+  --blue:#4facfe;
+  --purple:#a78bfa;
+  --white:#f5f9ff;
+  --muted:#6b7a99;
+  --glass:rgba(255,255,255,0.04);
+  --glass-b:rgba(255,255,255,0.08);
+  --card:rgba(9,14,30,0.85);
+}
+body{
+  background:var(--bg);color:var(--white);
+  font-family:'Urbanist',sans-serif;
+  line-height:1.7;
+}
+body::before{
+  content:'';position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 60% 50% at 20% 20%,rgba(79,172,254,0.05) 0%,transparent 70%),
+    radial-gradient(ellipse 50% 40% at 80% 80%,rgba(185,255,102,0.04) 0%,transparent 60%);
+  pointer-events:none;z-index:0;
+}
+.page{
+  position:relative;z-index:1;
+  max-width:860px;margin:0 auto;
+  padding:0 32px 80px;
+}
+
+/* ── Top nav ── */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:28px 0 0;margin-bottom:48px;
+}
+.back-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--glass);border:1px solid var(--glass-b);
+  border-radius:100px;padding:8px 18px;
+  font-size:13px;color:var(--muted);
+  text-decoration:none;transition:all 0.2s;letter-spacing:0.3px;
+}
+.back-btn:hover{color:var(--white);border-color:rgba(255,255,255,0.15)}
+.logo{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:20px;letter-spacing:3px;color:var(--white);
+  text-decoration:none;opacity:0.8;
+}
+
+/* ── Report header ── */
+.report-header{
+  border:1px solid var(--glass-b);border-radius:24px;
+  background:var(--card);backdrop-filter:blur(20px);
+  padding:40px 44px;margin-bottom:36px;
+  position:relative;overflow:hidden;
+}
+.report-header::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--lime),var(--blue),transparent);
+}
+.report-tag{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:10px;font-weight:700;letter-spacing:2.5px;
+  text-transform:uppercase;color:var(--lime);margin-bottom:16px;
+}
+.tag-line{width:20px;height:1px;background:var(--lime);opacity:0.5}
+.report-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(36px,6vw,58px);
+  letter-spacing:1px;line-height:1;
+  color:#fff;margin-bottom:8px;
+}
+.report-title span{
+  color:transparent;
+  -webkit-text-stroke:1px rgba(185,255,102,0.6);
+}
+.report-subtitle{
+  font-size:15px;color:var(--muted);
+  font-weight:300;margin-bottom:24px;
+}
+.report-meta{
+  display:flex;flex-wrap:wrap;gap:12px;margin-top:20px;
+}
+.meta-pill{
+  display:flex;align-items:center;gap:8px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.07);
+  border-radius:100px;padding:7px 16px;
+  font-size:12px;color:var(--muted);
+}
+.meta-pill b{color:var(--white);font-weight:600}
+
+/* ── Section card ── */
+.section{
+  background:var(--card);border:1px solid var(--glass-b);
+  border-radius:20px;padding:32px 36px;
+  backdrop-filter:blur(20px);margin-bottom:20px;
+  position:relative;overflow:hidden;
+}
+.section::after{
+  content:'';position:absolute;top:0;left:0;
+  width:3px;height:100%;
+  background:linear-gradient(180deg,var(--lime),transparent);
+}
+
+/* ── Section number label ── */
+.sec-num{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:11px;letter-spacing:3px;
+  color:var(--lime);margin-bottom:10px;
+  display:flex;align-items:center;gap:8px;
+}
+.sec-num::after{
+  content:'';flex:1;height:1px;
+  background:rgba(185,255,102,0.15);
+}
+
+h2{
+  font-family:'Urbanist',sans-serif;
+  font-size:20px;font-weight:700;
+  color:var(--white);margin-bottom:16px;
+  letter-spacing:-0.3px;
+}
+p{
+  font-size:14px;color:var(--muted);
+  line-height:1.85;margin-bottom:12px;
+}
+p:last-child{margin-bottom:0}
+
+/* ── Feature grid ── */
+.feature-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;margin-top:8px;
+}
+.feat{
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:14px;padding:16px 18px;
+}
+.feat-icon{font-size:22px;margin-bottom:8px}
+.feat-title{font-size:13px;font-weight:600;color:var(--white);margin-bottom:4px}
+.feat-desc{font-size:12px;color:var(--muted);line-height:1.6}
+
+/* ── Tech stack ── */
+.tech-stack{
+  display:flex;flex-wrap:wrap;gap:10px;margin-top:20px;
+}
+.tech{
+  background:rgba(185,255,102,0.06);
+  border:1px solid rgba(185,255,102,0.15);
+  border-radius:8px;padding:8px 16px;
+  font-size:12px;color:rgba(185,255,102,0.8);
+  font-weight:600;letter-spacing:0.5px;
+}
+
+/* ── Steps ── */
+.steps{display:flex;flex-direction:column;gap:14px;margin-top:8px}
+.step{display:flex;gap:16px;align-items:flex-start}
+.step-num{
+  width:28px;height:28px;border-radius:50%;
+  background:rgba(185,255,102,0.1);
+  border:1px solid rgba(185,255,102,0.25);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:var(--lime);
+  flex-shrink:0;margin-top:1px;
+}
+.step-text{font-size:14px;color:var(--muted);line-height:1.7}
+.step-text b{color:var(--white)}
+
+/* ── Conclusion card ── */
+.conclusion{
+  background:rgba(185,255,102,0.04);
+  border:1px solid rgba(185,255,102,0.15);
+  border-radius:20px;padding:32px 36px;
+  margin-bottom:20px;
+}
+.conclusion h2{color:var(--lime)}
+
+/* ── Table ── */
+table{width:100%;border-collapse:collapse;margin-top:8px}
+th{
+  font-size:11px;letter-spacing:2px;text-transform:uppercase;
+  color:rgba(255,255,255,0.25);font-weight:700;
+  padding:10px 14px;text-align:left;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+td{
+  font-size:13px;color:var(--muted);
+  padding:11px 14px;
+  border-bottom:1px solid rgba(255,255,255,0.04);
+}
+td:first-child{color:var(--white);font-weight:500}
+tr:last-child td{border-bottom:none}
+
+/* ── Footer ── */
+.report-footer{
+  text-align:center;padding:24px 0 0;
+  border-top:1px solid rgba(255,255,255,0.06);
+  font-size:12px;color:rgba(255,255,255,0.2);
+  letter-spacing:0.5px;
+}
+.report-footer span{color:var(--lime)}
+
+/* ── Responsive ── */
+@media(max-width:600px){
+  .page{padding:0 16px 60px}
+  .report-header{padding:28px 22px}
+  .section{padding:24px 20px}
+  .feature-grid{grid-template-columns:1fr}
+  .report-meta{gap:8px}
+  .topbar{padding:20px 0 0;margin-bottom:32px}
+  .conclusion{padding:24px 20px}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Top bar -->
+  <div class="topbar">
+    <a href="/" class="back-btn">← Back to Health-Tech</a>
+    <a href="/" class="logo">Health-Tech</a>
+  </div>
+
+  <!-- Report Header -->
+  <div class="report-header">
+    <div class="report-tag"><div class="tag-line"></div> College Project Report</div>
+    <div class="report-title">Health-Tech  <br/>Q&A Platform</div>
+    <div class="report-subtitle">A web-based health information system.</div>
+    <div class="report-meta">
+      <div class="meta-pill">👤 <b>Devanshu Sharma</b></div>
+      <div class="meta-pill">📅 <b>2026</b></div>
+      <div class="meta-pill">🎓 <b>College Final Project</b></div>
+      <div class="meta-pill">📍 <b>India</b></div>
+      <div class="meta-pill">✉️ <b>devanshusharmapc@gmail.com</b></div>
+    </div>
+  </div>
+
+  <!-- 1. Abstract -->
+  <div class="section">
+    <div class="sec-num">01 — Abstract</div>
+    <h2>Project Overview</h2>
+    <p>Health-Tech is a web-based health question and answer platform designed to make medical and health information accessible to everyone in simple, easy-to-understand language. The system provides clear 1–2 line answers to any health-related question, removing the confusion of complex medical terminology.</p>
+    <p>The platform uses a static database of 100+ pre-loaded health facts for instant responses. It also features voice search and text-to-speech functionality for improved accessibility.</p>
+  </div>
+
+  <!-- 2. Objectives -->
+  <div class="section">
+    <div class="sec-num">02 — Objectives</div>
+    <h2>Project Objectives</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-text"><b>Simplify health information</b> — Provide clear, jargon-free answers to health questions in 1–2 lines that anyone can understand.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-text"><b>Make it accessible</b> — Add voice search and text-to-speech so users can speak questions and hear answers without typing.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-text"><b>Modern UI/UX design</b> — Build a visually engaging, responsive interface with 3D elements and smooth animations.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-text"><b>Full-stack development</b> — Demonstrate knowledge of both frontend and backend technologies in a single project.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Features -->
+  <div class="section">
+    <div class="sec-num">03 — Features</div>
+    <h2>Key Features</h2>
+    <div class="feature-grid">
+      <div class="feat">
+        <div class="feat-icon">🎤</div>
+        <div class="feat-title">Voice Search</div>
+        <div class="feat-desc">Speak your question directly using the browser's Web Speech API. No typing needed.</div>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">🔊</div>
+        <div class="feat-title">Text to Speech</div>
+        <div class="feat-desc">Answers are read aloud automatically using the browser's speech synthesis engine.</div>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">📚</div>
+        <div class="feat-title">100+ Health Facts</div>
+        <div class="feat-desc">A built-in database with 100+ health questions covering bones, heart, vaccines, fever, fat and more.</div>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">🌐</div>
+        <div class="feat-title">3D Background</div>
+        <div class="feat-desc">Interactive Three.js 3D orbital atom scene with mouse parallax and dynamic lighting.</div>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">📱</div>
+        <div class="feat-title">Fully Responsive</div>
+        <div class="feat-desc">Works on all screen sizes — desktop, tablet and mobile with optimized layouts for each.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Tech Stack -->
+  <div class="section">
+    <div class="sec-num">04 — Technology</div>
+    <h2>Technology Stack</h2>
+    <table>
+      <tr><th>Layer</th><th>Technology</th><th>Purpose</th></tr>
+      <tr><td>Frontend</td><td>HTML5, CSS3, JavaScript</td><td>User interface and interactions</td></tr>
+      <tr><td>3D Graphics</td><td>Three.js (r128)</td><td>Animated 3D orbital atom background</td></tr>
+      <tr><td>Fonts</td><td>Google Fonts (Bebas Neue, Urbanist)</td><td>Typography and branding</td></tr>
+      <tr><td>Backend</td><td>Node.js + Express.js</td><td>REST API server and routing</td></tr>
+      <tr><td>AI Model</td><td>Intelligent question answering</td><td>—</td></tr>
+      <tr><td>Environment</td><td>dotenv</td><td>API key and config management</td></tr>
+      <tr><td>Voice</td><td>Web Speech API</td><td>Voice input and text-to-speech output</td></tr>
+    </table>
+    <div class="tech-stack">
+      <div class="tech">Node.js</div>
+      <div class="tech">Express.js</div>
+      <div class="tech">Three.js</div>
+      <div class="tech">HTML5</div>
+      <div class="tech">CSS3</div>
+      <div class="tech">JavaScript</div>
+      <div class="tech">Web Speech API</div>
+      <div class="tech">REST API</div>
+    </div>
+  </div>
+
+  <!-- 5. Architecture -->
+  <div class="section">
+    <div class="sec-num">05 — Architecture</div>
+    <h2>System Architecture</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-text"><b>User Input</b> — User types or speaks a health question on the frontend.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-text"><b>Frontend Request</b> — JavaScript sends a POST request to the backend API at <b>/api/ask</b> with the question.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-text"><b>Layer 1 — Static Bank</b> — The backend first checks 100+ pre-loaded Q&A pairs using smart keyword matching. If a match is found, it returns instantly.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-text"><b>Response</b> — The answer is sent back to the frontend, displayed with a typewriter effect, and read aloud automatically.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. Challenges -->
+  <div class="section">
+    <div class="sec-num">06 — Challenges</div>
+    <h2>Challenges Faced</h2>
+    <p><b style="color:var(--white)">API Key Setup:</b> Configuring environment variables and understanding how .env files work with Node.js was an initial challenge that was resolved by using the dotenv package.</p>
+    <p><b style="color:var(--white)">Smart Matching:</b> Simple string matching was not enough to match user questions to the database. A keyword scoring algorithm was built to improve accuracy significantly.</p>
+    <p><b style="color:var(--white)">CORS Issues:</b> When the frontend and backend were on different origins, CORS errors appeared. This was fixed by adding the cors middleware in Express.</p>
+    <p><b style="color:var(--white)">Responsive 3D:</b> Making the Three.js background work smoothly across all screen sizes and devices required careful pixel ratio and resize handling.</p>
+  </div>
+
+  <!-- 7. Conclusion -->
+  <div class="conclusion">
+    <div class="sec-num">07 — Conclusion</div>
+    <h2>Conclusion & Learning Outcomes</h2>
+    <p>Health-Tech successfully demonstrates a full-stack web application, voice interfaces, and 3D graphics into a practical, user-friendly product. The project covers a wide range of modern web development skills including backend API development, responsive design, and interactive 3D rendering.</p>
+    <p>Through this project, key concepts like REST APIs, environment configuration, browser APIs, and modern CSS design patterns were learned and applied. The end result is a working, deployable web application that solves a real-world problem — making health information simple and accessible for everyone.</p>
+  </div>
+
+  <!-- Footer -->
+  <div class="report-footer">
+    © 2025 HealthQ Project Report · <span>Devanshu Sharma</span> · devanshusharmapc@gmail.com
+  </div>
+
+</div>
+</body>
+</html>

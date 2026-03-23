@@ -1,0 +1,17 @@
+{
+  "name": "health-qa-backend",
+  "version": "1.0.0",
+  "description": "Health Q&A Backend API",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.20.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.22.1",
+    "groq-sdk": "^1.1.1"
+  }
+}
