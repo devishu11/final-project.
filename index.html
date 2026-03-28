@@ -583,12 +583,26 @@ function onLangChange(){
   if(rec) rec.lang=currentLang==='hi'?'hi-IN':'en-IN';
   const inp=document.getElementById('questionInput');
   const hint=document.getElementById('vhint');
+  const askBtn=document.getElementById('askBtn');
+  const clearBtn=document.querySelector('.clear-btn');
   if(currentLang==='hi'){
     inp.placeholder='कोई भी स्वास्थ्य प्रश्न पूछें…';
     hint.textContent='Enter दबाएं · Ask करें · या Voice उपयोग करें';
+    askBtn.textContent='पूछें';
+    if(clearBtn) clearBtn.textContent='✕ चैट साफ़ करें';
+    const wTitle=document.querySelector('.welcome-title');
+    const wSub=document.querySelector('.welcome-sub');
+    if(wTitle) wTitle.textContent='HealthQ तैयार है';
+    if(wSub) wSub.textContent='कोई भी स्वास्थ्य सवाल पूछें। मैं बातचीत याद रखता हूँ और आगे के सवालों का जवाब भी दे सकता हूँ।';
   } else {
     inp.placeholder='Ask a health question…';
     hint.textContent='Press Enter · Click Ask · or use Voice';
+    askBtn.textContent='Ask';
+    if(clearBtn) clearBtn.textContent='✕ Clear chat';
+    const wTitle=document.querySelector('.welcome-title');
+    const wSub=document.querySelector('.welcome-sub');
+    if(wTitle) wTitle.textContent='HealthQ is ready';
+    if(wSub) wSub.textContent='Ask me anything about your health. I remember the conversation so you can ask follow-up questions naturally.';
   }
 }
 
@@ -763,6 +777,8 @@ async function ask(){
       row.className='msg-row ai';
       const srcLabel = data.source==='ai'
         ? (currentLang==='hi'?'Groq AI · LLaMA 3 70B':'Groq AI · LLaMA 3 70B')
+        : data.source==='wikipedia'
+        ? (currentLang==='hi'?'Wikipedia · स्वास्थ्य लेख':'Wikipedia · Health Article')
         : (currentLang==='hi'?'स्वास्थ्य डेटाबेस':'Health Database');
       row.innerHTML=`
         <div class="msg-bubble">
@@ -774,7 +790,7 @@ async function ask(){
           <div class="msg-text"></div>
           <button class="msg-speak" onclick="toggleSpeak(this.dataset.text, this)">
             <div class="speak-bars"><b></b><b></b><b></b></div>
-            Read
+            <span class="speak-label">${currentLang==='hi'?'पढ़ें':'Read'}</span>
           </button>
         </div>`;
       win.appendChild(row);
