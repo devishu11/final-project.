@@ -3,6 +3,7 @@ const cors = require("cors");
 const path = require("path");
 require("dotenv").config();
 const Groq = require("groq-sdk");
+const https = require("https");
 
 const app = express();
 app.use(cors());
@@ -106,7 +107,7 @@ const qaBank = [
   { keys: ["exercise","benefit","good"], answer: "Exercise strengthens the heart, builds muscle, improves mood, boosts immunity, and helps maintain weight." },
 ];
 
-// ── Smart matching ────────────────────────────────────────────────────────────
+// ── Smart keyword matching ────────────────────────────────────────────────────
 function findStaticAnswer(question) {
   const q = question.toLowerCase().replace(/[?!.,]/g, "");
   const words = q.split(/\s+/);
@@ -122,35 +123,100 @@ function findStaticAnswer(question) {
   return bestScore >= 2 ? bestMatch : null;
 }
 
-// ── Groq Chat (multi-turn) ────────────────────────────────────────────────────
-async function getGroqChatAnswer(messages, language) {
+// ── Groq: always answer in the correct language ───────────────────────────────
+async function getGroqAnswer(messages, language) {
   const isHindi = language === "hi";
-  const systemPrompt = isHindi
-    ? "आप एक मददगार और बातचीत करने वाले स्वास्थ्य सहायक हैं। हमेशा हिंदी में जवाब दें। सरल, स्पष्ट भाषा में 2-4 वाक्यों में जवाब दें। पिछली बातचीत को याद रखें और उसके आधार पर जवाब दें। कोई मेडिकल जार्गन नहीं, कोई चेतावनी नहीं।"
-    : "You are a helpful, conversational health assistant. Answer in clear simple English in 2-4 sentences. Remember the conversation context and give follow-up answers naturally. No medical jargon, no disclaimers. Be warm and friendly like a knowledgeable friend.";
 
+  const systemPrompt = isHindi
+    ? `You are a health assistant. CRITICAL RULE: You MUST reply ONLY in Hindi (Devanagari script). Never use English. Not even one English word in your answer. Always write in Hindi देवनागरी only. Answer in 2-4 simple sentences. Remember the conversation context.`
+    : `You are a helpful health assistant. Always answer in clear simple English in 2-4 sentences. Remember the conversation and give natural follow-up answers. No medical jargon. No warnings. No disclaimers.`;
+
+  // For Hindi: wrap every user message to reinforce the language rule
+  const processedMessages = isHindi
+    ? messages.map(msg => {
+        if (msg.role === "user") {
+          return {
+            role: "user",
+            content: msg.content + "
+
+[IMPORTANT: Answer the above question in Hindi (Devanagari script) only. Do not use English at all.]"
+          };
+        }
+        return msg;
+      })
+    : messages;
+
+  const completion = await groq.chat.completions.create({
+    model: "llama3-70b-8192",
+    max_tokens: 250,
+    messages: [
+      { role: "system", content: systemPrompt },
+      ...processedMessages
+    ],
+  });
+  return completion.choices[0].message.content.trim();
+}
+
+// ── Groq: translate a static English answer to Hindi ─────────────────────────
+async function translateToHindi(englishText) {
   const completion = await groq.chat.completions.create({
     model: "llama3-70b-8192",
     max_tokens: 200,
     messages: [
-      { role: "system", content: systemPrompt },
-      ...messages
+      {
+        role: "system",
+        content: `You are a translator. CRITICAL: Translate the given English health fact into Hindi (Devanagari script) ONLY. Output ONLY the Hindi translation — no English words, no explanation, no extra text whatsoever.`
+      },
+      {
+        role: "user",
+        content: `Translate this English health fact to Hindi Devanagari script only (no English at all): "${englishText}"`
+      }
     ],
   });
-  return completion.choices[0].message.content;
+  return completion.choices[0].message.content.trim();
 }
 
-// ── Translate static answer to Hindi ─────────────────────────────────────────
-async function translateToHindi(text) {
-  const completion = await groq.chat.completions.create({
-    model: "llama3-70b-8192",
-    max_tokens: 150,
-    messages: [
-      { role: "system", content: "आप एक अनुवादक हैं। दिए गए अंग्रेज़ी स्वास्थ्य तथ्य को सरल हिंदी में अनुवाद करें। केवल अनुवाद दें, कोई अतिरिक्त टेक्स्ट नहीं।" },
-      { role: "user", content: "इसे हिंदी में अनुवाद करें: " + text },
-    ],
+// ── Wikipedia API: fetch clean health summary ────────────────────────────────
+function fetchWikipedia(query) {
+  return new Promise((resolve) => {
+    // Step 1: Search Wikipedia for the best matching article
+    const searchQuery = encodeURIComponent(query + " health medicine");
+    const searchUrl = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${searchQuery}&format=json&srlimit=1`;
+
+    https.get(searchUrl, { headers: { "User-Agent": "HealthQ/1.0 (college project)" } }, (res) => {
+      let data = "";
+      res.on("data", chunk => data += chunk);
+      res.on("end", () => {
+        try {
+          const json = JSON.parse(data);
+          const results = json?.query?.search;
+          if (!results || results.length === 0) return resolve(null);
+
+          const pageTitle = results[0].title;
+
+          // Step 2: Fetch the summary of that article
+          const summaryUrl = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(pageTitle)}`;
+          https.get(summaryUrl, { headers: { "User-Agent": "HealthQ/1.0 (college project)" } }, (res2) => {
+            let data2 = "";
+            res2.on("data", chunk => data2 += chunk);
+            res2.on("end", () => {
+              try {
+                const page = JSON.parse(data2);
+                // Only use if it looks like a real health/medical article
+                const extract = page?.extract;
+                if (!extract || extract.length < 30) return resolve(null);
+
+                // Take first 2-3 sentences max, keep it short like other answers
+                const sentences = extract.match(/[^.!?]+[.!?]+/g) || [];
+                const short = sentences.slice(0, 3).join(" ").trim();
+                resolve(short || null);
+              } catch { resolve(null); }
+            });
+          }).on("error", () => resolve(null));
+        } catch { resolve(null); }
+      });
+    }).on("error", () => resolve(null));
   });
-  return completion.choices[0].message.content;
 }
 
 // ── Routes ────────────────────────────────────────────────────────────────────
@@ -160,34 +226,57 @@ app.get("/", (req, res) => {
 
 app.post("/api/ask", async (req, res) => {
   const { question, messages = [], language = "en" } = req.body;
+
   if (!question || question.trim() === "")
     return res.status(400).json({ success: false, error: "Please provide a question." });
 
   const isHindi = language === "hi";
 
-  // Layer 1: Static match only for first message (no prior conversation)
-  if (messages.length <= 1) {
-    const staticAnswer = findStaticAnswer(question);
-    if (staticAnswer) {
-      if (isHindi) {
-        try {
-          const translated = await translateToHindi(staticAnswer);
-          return res.json({ success: true, question, answer: translated, source: "static" });
-        } catch {
-          return res.json({ success: true, question, answer: staticAnswer, source: "static" });
-        }
+  // Layer 1: Try static Q&A bank (keyword match on English question)
+  // Always attempt static lookup regardless of conversation length
+  const staticAnswer = findStaticAnswer(question);
+
+  if (staticAnswer) {
+    if (isHindi) {
+      // Translate the English static answer to Hindi via Groq
+      try {
+        const hindi = await translateToHindi(staticAnswer);
+        return res.json({ success: true, question, answer: hindi, source: "static" });
+      } catch (err) {
+        console.error("Translation error:", err.message);
+        // Translation failed — fall through to Groq chat below
       }
+    } else {
+      // English — return directly
       return res.json({ success: true, question, answer: staticAnswer, source: "static" });
     }
   }
 
-  // Layer 2: Groq AI with full conversation history
+  // Layer 2: Wikipedia API
   try {
-    const aiAnswer = await getGroqChatAnswer(messages, language);
+    const wikiAnswer = await fetchWikipedia(question);
+    if (wikiAnswer) {
+      if (isHindi) {
+        try {
+          const hindiWiki = await translateToHindi(wikiAnswer);
+          return res.json({ success: true, question, answer: hindiWiki, source: "wikipedia" });
+        } catch {
+          return res.json({ success: true, question, answer: wikiAnswer, source: "wikipedia" });
+        }
+      }
+      return res.json({ success: true, question, answer: wikiAnswer, source: "wikipedia" });
+    }
+  } catch (err) {
+    console.error("Wikipedia Error:", err.message);
+  }
+
+  // Layer 3: Groq AI with full conversation history (ultimate fallback)
+  try {
+    const aiAnswer = await getGroqAnswer(messages, language);
     return res.json({ success: true, question, answer: aiAnswer, source: "ai" });
   } catch (err) {
     console.error("Groq Error:", err.message);
-    return res.status(500).json({ success: false, error: "Could not get an answer. Try again." });
+    return res.status(500).json({ success: false, error: "Could not get an answer. Please try again." });
   }
 });
 
@@ -196,6 +285,6 @@ app.get("/api/questions", (req, res) => {
 });
 
 app.listen(3000, () => {
-  console.log("Server running! Open Chrome: http://localhost:3000");
-  console.log("HealthQ Chat ready with " + qaBank.length + " topics + Groq AI (llama3-70b) fallback!");
+  console.log("✅ Server running at http://localhost:3000");
+  console.log("📚 " + qaBank.length + " static topics + Groq LLaMA 3 70B fallback");
 });
