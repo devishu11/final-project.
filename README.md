@@ -5,7 +5,7 @@ A web-based health question and answer platform that gives simple, clear answers
 ---
 
 ## 🌐 Live Demo
-> Coming soon after deployment
+> health-tech.up.railway.app
 
 ---
 
