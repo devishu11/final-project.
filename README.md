@@ -1,4 +1,4 @@
-# HealthQ — AI Health Q&A Platform
+# Health- Tech = Health Q&A Platform
 
 A web-based health question and answer platform that gives simple, clear answers to any health question in 1–2 lines. Built as a college final project.
 
