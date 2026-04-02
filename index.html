@@ -3,829 +3,407 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>HealthQ — Your Body, Explained</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Urbanist:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<title>HealthQ</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Urbanist:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#04060f;
   --lime:#b9ff66;
-  --lime-dim:#94d444;
   --blue:#4facfe;
   --purple:#a78bfa;
   --white:#f5f9ff;
-  --muted:#4a5568;
-  --glass:rgba(255,255,255,0.04);
-  --glass-b:rgba(255,255,255,0.08);
-  --card-bg:rgba(9,14,30,0.85);
+  --card-bg:rgba(4,8,22,0.72);
 }
-html,body{height:100%}
+html,body{height:100%;overflow:hidden}
 body{
   background:var(--bg);color:var(--white);
   font-family:'Urbanist',sans-serif;
-  overflow-x:hidden;cursor:none;
+  cursor:none;
 }
 
-/* ── Custom cursor ── */
-#cursor{position:fixed;width:7px;height:7px;border-radius:50%;background:var(--lime);pointer-events:none;z-index:10000;transform:translate(-50%,-50%);box-shadow:0 0 8px rgba(185,255,102,0.9);transition:width 0.2s,height 0.2s}
+/* Cursor */
+#cursor{position:fixed;width:7px;height:7px;border-radius:50%;background:var(--lime);pointer-events:none;z-index:10000;transform:translate(-50%,-50%);box-shadow:0 0 8px rgba(185,255,102,.9);transition:width .2s,height .2s}
 #cursor.hover{width:11px;height:11px}
-#cursor-ring{position:fixed;width:34px;height:34px;border-radius:50%;border:1.5px solid rgba(185,255,102,0.45);pointer-events:none;z-index:9999;transform:translate(-50%,-50%);box-shadow:0 0 12px rgba(185,255,102,0.12);transition:width 0.35s cubic-bezier(0.16,1,0.3,1),height 0.35s cubic-bezier(0.16,1,0.3,1),border-color 0.35s}
-#cursor-ring.hover{width:50px;height:50px;border-color:rgba(185,255,102,0.2)}
+#cursor-ring{position:fixed;width:34px;height:34px;border-radius:50%;border:1.5px solid rgba(185,255,102,.45);pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .35s cubic-bezier(.16,1,.3,1),height .35s,border-color .35s}
+#cursor-ring.hover{width:50px;height:50px;border-color:rgba(185,255,102,.2)}
 @media(hover:none),(pointer:coarse){#cursor,#cursor-ring{display:none!important}body{cursor:auto!important}}
 
-/* ── 3D Canvas ── */
+/* 3D canvas */
 #bg{position:fixed;inset:0;z-index:0;pointer-events:none}
 
-/* ── Gradient mesh ── */
-.mesh{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 70% 60% at 50% 50%,rgba(79,172,254,0.07) 0%,transparent 70%),radial-gradient(ellipse 40% 40% at 20% 80%,rgba(167,139,250,0.06) 0%,transparent 60%),radial-gradient(ellipse 50% 50% at 80% 20%,rgba(185,255,102,0.04) 0%,transparent 60%)}
+/* Wordmark */
+#wordmark{position:fixed;top:28px;left:32px;z-index:10;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3.5px;color:rgba(255,255,255,.22);pointer-events:none;}
 
-/* ── Page wrapper ── */
-.page{position:relative;z-index:2;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:0 24px}
+/* State label */
+#state-label{position:fixed;top:28px;right:32px;z-index:10;display:flex;align-items:center;gap:7px;font-size:11px;letter-spacing:1.8px;text-transform:uppercase;color:rgba(255,255,255,.22);transition:color .5s;pointer-events:none;}
+#state-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.18);transition:background .5s,box-shadow .5s;}
+#state-label.thinking{color:rgba(79,172,254,.7)}
+#state-label.thinking #state-dot{background:#4facfe;box-shadow:0 0 10px rgba(79,172,254,.9);animation:sPulse .7s ease infinite}
+#state-label.speaking{color:rgba(185,255,102,.8)}
+#state-label.speaking #state-dot{background:var(--lime);box-shadow:0 0 12px rgba(185,255,102,1)}
+@keyframes sPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.7);opacity:.5}}
+.wv{display:flex;align-items:center;gap:2px;height:12px;margin-left:2px}
+.wv span{display:block;width:2px;border-radius:2px;background:currentColor;height:3px}
+#state-label.speaking .wv span:nth-child(1){animation:wvB .5s ease infinite 0s}
+#state-label.speaking .wv span:nth-child(2){animation:wvB .5s ease infinite .08s}
+#state-label.speaking .wv span:nth-child(3){animation:wvB .5s ease infinite .16s}
+#state-label.speaking .wv span:nth-child(4){animation:wvB .5s ease infinite .24s}
+#state-label.speaking .wv span:nth-child(5){animation:wvB .5s ease infinite .32s}
+#state-label.thinking .wv span:nth-child(odd){height:7px}
+#state-label.thinking .wv span:nth-child(even){height:4px}
+@keyframes wvB{0%,100%{height:3px}50%{height:11px}}
 
-/* ── Nav ── */
-nav{width:100%;max-width:860px;display:flex;align-items:center;justify-content:space-between;padding:32px 0 0;animation:fadeUp 1s ease both}
-.nav-logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--white);opacity:0.9}
-.nav-pill{display:flex;align-items:center;gap:8px;background:var(--glass);border:1px solid var(--glass-b);border-radius:100px;padding:7px 16px;font-size:12px;color:var(--muted);letter-spacing:0.5px;backdrop-filter:blur(12px)}
-.live-dot{width:6px;height:6px;border-radius:50%;background:var(--lime);box-shadow:0 0 8px var(--lime);animation:breathe 2.5s ease infinite}
-@keyframes breathe{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.7)}}
+/* Centre overlay */
+#centre{position:fixed;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;padding:0 32px 140px;}
 
-/* ── Hero ── */
-.hero{width:100%;max-width:860px;margin-top:60px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:16px;animation:fadeUp 1s ease 0.1s both}
-.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--lime)}
-h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(52px,10vw,110px);line-height:0.92;letter-spacing:2px;color:#fff;text-shadow:0 0 80px rgba(185,255,102,0.1)}
-h1 .accent{color:transparent;-webkit-text-stroke:1px rgba(185,255,102,0.6)}
-.sub{font-size:15px;font-weight:300;color:var(--muted);line-height:1.7;max-width:400px}
+/* Idle hint */
+#idle-hint{font-size:13px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.18);transition:opacity .6s;animation:idleFloat 3s ease-in-out infinite;}
+@keyframes idleFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 
-/* ══════════════════════════
-   CHAT WINDOW
-══════════════════════════ */
-.chat-wrap{
-  width:100%;max-width:720px;
-  margin-top:28px;
-  display:flex;flex-direction:column;
-  animation:fadeUp 1s ease 0.25s both;
-  padding-bottom:32px;
-}
-
-/* Chat messages area */
-.chat-window{
-  width:100%;
-  min-height:120px;
-  max-height:480px;
-  overflow-y:auto;
-  display:flex;flex-direction:column;gap:0;
-  padding:4px 0 8px;
-  scroll-behavior:smooth;
-}
-.chat-window::-webkit-scrollbar{width:4px}
-.chat-window::-webkit-scrollbar-track{background:transparent}
-.chat-window::-webkit-scrollbar-thumb{background:rgba(185,255,102,0.15);border-radius:4px}
-
-/* Welcome message */
-.chat-welcome{
-  text-align:center;padding:40px 20px;
-  display:flex;flex-direction:column;align-items:center;gap:12px;
-}
-.welcome-icon{font-size:36px;opacity:0.6}
-.welcome-title{font-size:16px;font-weight:600;color:rgba(255,255,255,0.5);letter-spacing:0.5px}
-.welcome-sub{font-size:13px;color:rgba(255,255,255,0.2);line-height:1.6;max-width:340px}
-
-/* Message rows */
-.msg-row{
-  display:flex;
-  padding:6px 0;
-  animation:msgIn 0.35s cubic-bezier(0.16,1,0.3,1) both;
-}
-@keyframes msgIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-.msg-row.user{justify-content:flex-end}
-.msg-row.ai{justify-content:flex-start}
-
-/* Message bubble */
-.msg-bubble{
-  max-width:82%;
-  padding:0;
-  position:relative;
-}
-
-/* User message */
-.msg-row.user .msg-bubble{
-  background:rgba(185,255,102,0.08);
-  border:1px solid rgba(185,255,102,0.18);
-  border-radius:18px 18px 4px 18px;
-  padding:12px 18px;
-  font-size:15px;
-  color:rgba(255,255,255,0.85);
-  font-weight:400;
-  line-height:1.6;
-}
-
-/* AI message — Claude-style: no bubble, just clean text with a left accent */
-.msg-row.ai .msg-bubble{
-  padding:10px 0 10px 18px;
-  border-left:2px solid rgba(185,255,102,0.35);
-  font-size:15px;
-  color:var(--white);
-  font-weight:400;
-  line-height:1.75;
-}
-.msg-meta{
-  display:flex;align-items:center;gap:7px;
-  margin-bottom:6px;
-}
-.msg-avatar{
-  width:22px;height:22px;border-radius:50%;
-  background:linear-gradient(135deg,var(--lime),var(--blue));
-  display:flex;align-items:center;justify-content:center;
-  font-size:11px;font-weight:700;color:#04060f;
-  flex-shrink:0;
-}
-.msg-name{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--lime);opacity:0.8}
-.msg-src{font-size:10px;color:rgba(255,255,255,0.2);letter-spacing:0.5px;margin-left:auto}
-
-/* Speak button per message */
-.msg-speak{
-  margin-top:8px;
-  display:inline-flex;align-items:center;gap:5px;
-  background:none;border:1px solid rgba(255,255,255,0.07);
-  border-radius:8px;padding:4px 10px;
-  font-size:10px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;
-  color:rgba(255,255,255,0.25);cursor:none;
-  font-family:'Urbanist',sans-serif;
-  transition:all 0.2s;
-}
-.msg-speak:hover{color:var(--white);border-color:rgba(255,255,255,0.15)}
-.msg-speak.on{color:var(--lime);border-color:rgba(185,255,102,0.3);background:rgba(185,255,102,0.05)}
+/* Answer card */
+#answer-card{max-width:600px;width:100%;background:var(--card-bg);border:1px solid rgba(185,255,102,.1);border-radius:22px;padding:28px 32px 24px;backdrop-filter:blur(28px);box-shadow:0 0 60px rgba(185,255,102,.06),0 20px 60px rgba(0,0,0,.5);opacity:0;transform:translateY(18px) scale(.97);transition:opacity .55s cubic-bezier(.16,1,.3,1),transform .55s cubic-bezier(.16,1,.3,1);pointer-events:auto;max-height:45vh;overflow-y:auto;}
+#answer-card.visible{opacity:1;transform:translateY(0) scale(1)}
+#answer-card::-webkit-scrollbar{width:3px}
+#answer-card::-webkit-scrollbar-track{background:transparent}
+#answer-card::-webkit-scrollbar-thumb{background:rgba(185,255,102,.2);border-radius:3px}
+#answer-text{font-size:15px;font-weight:400;line-height:1.8;color:rgba(255,255,255,.88);}
+.answer-footer{display:flex;align-items:center;justify-content:space-between;margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.06);}
+.src-tag{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.18);}
+#speakBtn{display:flex;align-items:center;gap:6px;background:none;border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:5px 12px;font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:rgba(255,255,255,.3);cursor:none;font-family:'Urbanist',sans-serif;transition:all .2s;}
+#speakBtn:hover{color:var(--white);border-color:rgba(255,255,255,.18)}
+#speakBtn.on{color:var(--lime);border-color:rgba(185,255,102,.3);background:rgba(185,255,102,.05)}
 .speak-bars{display:flex;align-items:center;gap:1.5px;height:10px}
 .speak-bars b{display:block;width:2px;background:currentColor;border-radius:2px;height:3px}
-.msg-speak.on .speak-bars b:nth-child(1){animation:b 0.7s ease infinite 0s}
-.msg-speak.on .speak-bars b:nth-child(2){animation:b 0.7s ease infinite 0.18s}
-.msg-speak.on .speak-bars b:nth-child(3){animation:b 0.7s ease infinite 0.36s}
-@keyframes b{0%,100%{height:3px}50%{height:10px}}
+#speakBtn.on .speak-bars b:nth-child(1){animation:sb .65s ease infinite 0s}
+#speakBtn.on .speak-bars b:nth-child(2){animation:sb .65s ease infinite .15s}
+#speakBtn.on .speak-bars b:nth-child(3){animation:sb .65s ease infinite .3s}
+@keyframes sb{0%,100%{height:3px}50%{height:10px}}
 
-/* Typing indicator */
-.typing-row{display:flex;padding:8px 0;animation:msgIn 0.3s ease both}
-.typing-bubble{padding:12px 18px;border-left:2px solid rgba(185,255,102,0.2)}
-.thinking{display:flex;gap:5px;padding:2px 0}
-.thinking span{width:6px;height:6px;border-radius:50%;background:rgba(185,255,102,0.5);animation:th 1.2s ease infinite}
-.thinking span:nth-child(2){animation-delay:0.2s}
-.thinking span:nth-child(3){animation-delay:0.4s}
-@keyframes th{0%,80%,100%{transform:scale(0.7);opacity:0.3}40%{transform:scale(1);opacity:1}}
-
-/* Error message */
-.err-row{display:flex;padding:6px 0}
-.err-bubble{background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);border-radius:14px;padding:12px 18px;color:rgba(239,100,100,0.8);font-size:14px;display:flex;align-items:center;gap:8px}
-
-/* Divider between chat and input */
-.chat-divider{width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.06),transparent);margin:12px 0}
-
-/* ── Input Bar ── */
-.input-wrap{width:100%}
-.input-glow{position:relative;border-radius:20px;background:linear-gradient(135deg,rgba(185,255,102,0.2),rgba(79,172,254,0.1),rgba(167,139,250,0.15));padding:1.5px}
-.input-glow::before{content:'';position:absolute;inset:-2px;border-radius:22px;background:linear-gradient(135deg,rgba(185,255,102,0.15),rgba(79,172,254,0.1),rgba(167,139,250,0.1));filter:blur(12px);z-index:-1;opacity:0;transition:opacity 0.4s}
-.input-glow:focus-within::before{opacity:1}
-.input-inner{display:flex;align-items:center;gap:8px;background:var(--card-bg);border-radius:19px;padding:8px 8px 8px 22px;backdrop-filter:blur(24px)}
-input{flex:1;background:none;border:none;outline:none;color:var(--white);font-family:'Urbanist',sans-serif;font-size:16px;font-weight:400;padding:13px 0;caret-color:var(--lime)}
-input::placeholder{color:rgba(255,255,255,0.2)}
-
-#voiceBtn{width:48px;height:48px;border-radius:14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.3);font-size:16px;cursor:none;display:flex;align-items:center;justify-content:center;transition:all 0.25s;flex-shrink:0}
-#voiceBtn:hover{background:rgba(255,255,255,0.08);color:var(--white);border-color:rgba(255,255,255,0.15)}
-#voiceBtn.listening{background:rgba(239,68,68,0.12);border-color:rgba(239,68,68,0.4);color:#f87171;animation:mic-ring 1.2s ease infinite}
-@keyframes mic-ring{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,0.3)}60%{box-shadow:0 0 0 10px rgba(239,68,68,0)}}
-
-#langSelect{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;color:rgba(255,255,255,0.6);font-family:'Urbanist',sans-serif;font-size:13px;font-weight:600;padding:0 12px;height:48px;outline:none;cursor:none;flex-shrink:0;transition:all 0.25s;letter-spacing:0.3px;appearance:none;-webkit-appearance:none;text-align:center}
-#langSelect:hover{background:rgba(185,255,102,0.08);border-color:rgba(185,255,102,0.3);color:var(--lime)}
-#langSelect option{background:#04060f;color:var(--white)}
-
-#askBtn{background:var(--lime);color:#04060f;border:none;border-radius:14px;padding:13px 28px;font-family:'Urbanist',sans-serif;font-size:14px;font-weight:700;cursor:none;flex-shrink:0;letter-spacing:0.5px;transition:all 0.25s;box-shadow:0 4px 24px rgba(185,255,102,0.25)}
-#askBtn:hover{background:#c9ff77;box-shadow:0 8px 32px rgba(185,255,102,0.4);transform:translateY(-1px)}
+/* Input bar */
+#input-wrap{position:fixed;bottom:36px;left:50%;transform:translateX(-50%);z-index:10;width:min(640px,calc(100vw - 48px));}
+.ig{position:relative;border-radius:20px;background:linear-gradient(135deg,rgba(185,255,102,.18),rgba(79,172,254,.1),rgba(167,139,250,.12));padding:1.5px;}
+.ig::before{content:'';position:absolute;inset:-3px;border-radius:23px;background:linear-gradient(135deg,rgba(185,255,102,.1),rgba(79,172,254,.08),rgba(167,139,250,.08));filter:blur(14px);z-index:-1;opacity:0;transition:opacity .4s;}
+.ig:focus-within::before{opacity:1}
+.ii{display:flex;align-items:center;gap:8px;background:rgba(4,8,22,.92);border-radius:19px;padding:8px 8px 8px 22px;backdrop-filter:blur(24px);}
+#qi{flex:1;background:none;border:none;outline:none;color:var(--white);font-family:'Urbanist',sans-serif;font-size:16px;font-weight:400;padding:13px 0;caret-color:var(--lime);}
+#qi::placeholder{color:rgba(255,255,255,.2)}
+#voiceBtn{width:48px;height:48px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.35);font-size:16px;cursor:none;display:flex;align-items:center;justify-content:center;transition:all .25s;flex-shrink:0;}
+#voiceBtn:hover{background:rgba(255,255,255,.09);color:var(--white);border-color:rgba(255,255,255,.18)}
+#voiceBtn.listening{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.4);color:#f87171;animation:mRing 1.2s ease infinite}
+@keyframes mRing{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.3)}60%{box-shadow:0 0 0 10px rgba(239,68,68,0)}}
+#askBtn{background:var(--lime);color:#04060f;border:none;border-radius:14px;padding:13px 26px;font-family:'Urbanist',sans-serif;font-size:14px;font-weight:700;cursor:none;flex-shrink:0;letter-spacing:.5px;transition:all .25s;box-shadow:0 4px 24px rgba(185,255,102,.25);}
+#askBtn:hover{background:#c9ff77;box-shadow:0 8px 32px rgba(185,255,102,.4);transform:translateY(-1px)}
 #askBtn:active{transform:translateY(1px)}
-#askBtn:disabled{opacity:0.35;cursor:none;transform:none}
+#askBtn:disabled{opacity:.35;cursor:none;transform:none}
+#langSelect{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;color:rgba(255,255,255,.55);font-family:'Urbanist',sans-serif;font-size:13px;font-weight:600;padding:0 12px;height:48px;outline:none;cursor:none;flex-shrink:0;transition:all .25s;appearance:none;text-align:center;}
+#langSelect:hover{background:rgba(185,255,102,.08);border-color:rgba(185,255,102,.3);color:var(--lime)}
+#langSelect option{background:#04060f;color:var(--white)}
+#hint{text-align:center;font-size:11px;color:rgba(255,255,255,.14);margin-top:10px;letter-spacing:.5px;transition:color .3s;}
+#hint.red{color:#f87171}
 
-.input-hint{font-size:12px;color:rgba(255,255,255,0.18);text-align:center;margin-top:10px;letter-spacing:0.5px;min-height:16px;transition:color 0.3s}
-.input-hint.red{color:#f87171}
-
-/* Clear chat button */
-.chat-toolbar{display:flex;align-items:center;justify-content:flex-end;margin-bottom:6px;min-height:24px}
-.clear-btn{background:none;border:none;font-size:11px;color:rgba(255,255,255,0.2);cursor:none;font-family:'Urbanist',sans-serif;letter-spacing:0.5px;padding:4px 8px;border-radius:6px;transition:all 0.2s}
-.clear-btn:hover{color:rgba(239,100,100,0.7);background:rgba(239,68,68,0.06)}
-
-/* ══════════════════════════
-   FOOTER
-══════════════════════════ */
-.site-footer{position:relative;z-index:2;width:100%;background:rgba(4,6,15,0.97);border-top:1px solid rgba(255,255,255,0.06);backdrop-filter:blur(20px);margin-top:60px}
-.footer-line{height:2px;background:linear-gradient(90deg,transparent,rgba(185,255,102,0.4),rgba(79,172,254,0.3),transparent)}
-.footer-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1.5fr;gap:48px;padding:56px 40px 40px}
-.footer-logo{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px;color:var(--white);margin-bottom:14px}
-.footer-desc{font-size:13px;line-height:1.75;color:var(--muted);max-width:280px;margin-bottom:18px}
-.footer-badges{display:flex;flex-wrap:wrap;gap:8px}
-.fbadge{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:100px;padding:5px 12px;font-size:11px;color:rgba(255,255,255,0.4);letter-spacing:0.3px}
-.fcol-title{font-family:'Urbanist',sans-serif;font-size:11px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,0.25);margin-bottom:20px}
-.flinks{list-style:none;display:flex;flex-direction:column;gap:12px}
-.flinks li{font-size:13px;color:var(--muted);cursor:pointer;transition:color 0.2s;letter-spacing:0.3px}
-.flinks li:hover{color:var(--lime)}
-.fcontact{list-style:none;display:flex;flex-direction:column;gap:16px}
-.fcontact li{display:flex;align-items:flex-start;gap:12px}
-.ficon{font-size:16px;line-height:1.4;flex-shrink:0}
-.fcontact-label{font-size:10px;color:rgba(255,255,255,0.2);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:2px}
-.fcontact-val{font-size:13px;color:var(--muted)}
-.flink{color:var(--muted);text-decoration:none;transition:color 0.2s}
-.flink:hover{color:var(--lime)}
-.report-link{display:inline-flex;align-items:center;gap:8px;background:rgba(185,255,102,0.08);border:1px solid rgba(185,255,102,0.25);border-radius:10px;padding:10px 20px;font-size:13px;font-weight:600;color:var(--lime);text-decoration:none;transition:all 0.25s;margin-bottom:18px;letter-spacing:0.3px;width:fit-content}
-.report-link:hover{background:rgba(185,255,102,0.14);border-color:rgba(185,255,102,0.5);transform:translateY(-1px)}
-.footer-about{border-top:1px solid rgba(255,255,255,0.05);padding:32px 40px;max-width:1100px;margin:0 auto}
-.about-inner{max-width:720px}
-.about-title{font-family:'Urbanist',sans-serif;font-size:11px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--lime);margin-bottom:12px}
-.about-text{font-size:13px;color:var(--muted);line-height:1.8;margin-bottom:16px}
-.about-tags{display:flex;flex-wrap:wrap;gap:8px}
-.about-tags span{background:rgba(185,255,102,0.06);border:1px solid rgba(185,255,102,0.15);border-radius:6px;padding:4px 12px;font-size:11px;color:rgba(185,255,102,0.7);letter-spacing:0.5px;font-weight:500}
-.footer-bottom{border-top:1px solid rgba(255,255,255,0.04);max-width:1100px;margin:0 auto;padding:20px 40px;display:flex;align-items:center;justify-content:space-between}
-.footer-copy{font-size:12px;color:rgba(255,255,255,0.2);letter-spacing:0.3px}
-.footer-note{font-size:12px;color:rgba(255,255,255,0.15);letter-spacing:0.3px}
-.lime{color:var(--lime)}
-
-/* ── Animations ── */
-@keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
-
-/* ── Responsive ── */
-@media(max-width:1024px){.hero{margin-top:48px}h1{font-size:clamp(48px,9vw,90px)}}
-@media(max-width:768px){
-  .page{padding:0 16px}
-  nav{padding:24px 0 0}
-  .hero{margin-top:36px;gap:12px}
-  h1{font-size:clamp(44px,12vw,80px)}
-  .sub{font-size:14px}
-  .chat-wrap{max-width:100%}
-  .chat-window{max-height:360px}
-  .footer-inner{grid-template-columns:1fr 1fr;gap:36px;padding:40px 28px 32px}
-  .fcol-brand{grid-column:1 / -1}
-  .footer-about{padding:24px 28px}
-  .footer-bottom{padding:18px 28px;flex-direction:column;gap:8px;text-align:center}
-}
 @media(max-width:600px){
-  body{cursor:auto}
-  #cursor,#cursor-ring{display:none!important}
-  #askBtn,#voiceBtn,#langSelect,.clear-btn,.msg-speak{cursor:pointer}
-  nav{padding:20px 0 0}
-  .nav-logo{font-size:18px;letter-spacing:2px}
-  .nav-pill{font-size:11px;padding:6px 13px}
-  .hero{margin-top:28px;gap:10px}
-  h1{font-size:clamp(44px,15vw,72px);letter-spacing:0;line-height:0.9}
-  .sub{font-size:13px}
-  .input-inner{padding:6px 6px 6px 16px;gap:6px}
-  input{font-size:15px;padding:12px 0}
-  #voiceBtn{width:42px;height:42px;font-size:14px}
-  #askBtn{padding:11px 18px;font-size:13px}
-  #langSelect{height:42px;font-size:12px;padding:0 8px}
-  .msg-row.user .msg-bubble,.msg-row.ai .msg-bubble{font-size:14px}
-  .chat-window{max-height:300px}
-  .footer-inner{grid-template-columns:1fr;gap:28px;padding:32px 20px 24px}
-  .fcol-brand{grid-column:1}
-  .footer-desc{max-width:100%}
-  .footer-about{padding:20px}
-  .footer-bottom{padding:16px 20px}
+  body{cursor:auto}#cursor,#cursor-ring{display:none!important}
+  #askBtn,#voiceBtn,#langSelect,#speakBtn{cursor:pointer}
+  .ii{padding:6px 6px 6px 16px;gap:6px}
+  #qi{font-size:15px;padding:11px 0}
+  #voiceBtn,#askBtn{width:42px;height:42px;font-size:13px}
+  #askBtn{padding:11px 18px}
+  #langSelect{height:42px;font-size:12px}
+  #answer-card{padding:20px 18px 16px;max-height:42vh}
+  #answer-text{font-size:14px}
+  #centre{padding:0 20px 130px}
+  #input-wrap{bottom:24px}
+  #wordmark{top:20px;left:20px;font-size:17px}
+  #state-label{top:22px;right:20px}
 }
-@media(max-width:380px){h1{font-size:44px}#askBtn{padding:11px 12px;font-size:12px}}
-@media(hover:none){#askBtn:hover{transform:none;box-shadow:0 4px 24px rgba(185,255,102,0.25)}}
-@media(max-width:768px) and (orientation:landscape){.hero{margin-top:12px;gap:8px}h1{font-size:clamp(32px,7vh,56px)}.sub{display:none}nav{padding:10px 0 0}}
 </style>
 </head>
 <body>
 
-<!-- Custom cursor -->
 <div id="cursor"></div>
 <div id="cursor-ring"></div>
-
-<!-- 3D Background -->
 <canvas id="bg"></canvas>
-<div class="mesh"></div>
 
-<div class="page">
+<div id="wordmark">HEALTHQ</div>
 
-  <!-- Nav -->
-  <nav>
-    <div class="nav-logo">Health-Tech</div>
-    <div class="nav-pill">
-      <div class="live-dot"></div>
-      AI Health Chat
-    </div>
-  </nav>
-
-  <!-- Hero -->
-  <div class="hero">
-    <div class="hero-eyebrow">Know Your Body</div>
-    <h1>ASK.<br/><span class="accent">LEARN.</span><br/>THRIVE.</h1>
-    <p class="sub">Simple, clear answers to any health question. Ask a follow-up. Have a real conversation.</p>
-  </div>
-
-  <!-- Chat -->
-  <div class="chat-wrap">
-
-    <div class="chat-toolbar">
-      <button class="clear-btn" onclick="clearChat()">✕ Clear chat</button>
-    </div>
-
-    <!-- Messages -->
-    <div class="chat-window" id="chatWindow">
-      <div class="chat-welcome" id="chatWelcome">
-        <div class="welcome-icon">🩺</div>
-        <div class="welcome-title">HealthQ is ready</div>
-        <div class="welcome-sub">Ask me anything about your health. I remember the conversation so you can ask follow-up questions naturally.</div>
-      </div>
-    </div>
-
-    <div class="chat-divider"></div>
-
-    <!-- Input -->
-    <div class="input-wrap">
-      <div class="input-glow">
-        <div class="input-inner">
-          <input id="questionInput" type="text"
-            placeholder="Ask a health question…"
-            autocomplete="off"/>
-          <button id="voiceBtn" title="Voice input">🎤</button>
-          <select id="langSelect" title="Language" onchange="onLangChange()">
-            <option value="en">🇬🇧 EN</option>
-            <option value="hi">🇮🇳 HI</option>
-          </select>
-          <button id="askBtn" onclick="ask()">Ask</button>
-        </div>
-      </div>
-      <div class="input-hint" id="vhint">Press Enter · Click Ask · or use Voice</div>
-    </div>
-
-  </div>
-
+<div id="state-label">
+  <div id="state-dot"></div>
+  <div class="wv"><span></span><span></span><span></span><span></span><span></span></div>
+  <span id="state-text">Idle</span>
 </div>
 
-<!-- FOOTER -->
-<footer class="site-footer">
-  <div class="footer-line"></div>
-  <div class="footer-inner">
-    <div class="fcol fcol-brand">
-      <div class="footer-logo">Health-Tech</div>
-      <p class="footer-desc">A conversational AI health Q&amp;A platform built as a college project. Ask any health question and get a clear, simple answer instantly.</p>
-      <div class="footer-badges">
-        <span class="fbadge">Health</span>
-        <span class="fbadge">AI Chat</span>
-        <span class="fbadge">Voice Search</span>
-        <span class="fbadge">Hindi Support</span>
-      </div>
-    </div>
-    <div class="fcol">
-      <div class="fcol-title">Quick Links</div>
-      <ul class="flinks">
-        <li onclick="scrollToTop()">Home</li>
-        <li onclick="focusChat()">Start Chat</li>
-        <li onclick="scrollToAbout()">About Project</li>
-        <li onclick="scrollToContact()">Contact</li>
-      </ul>
-    </div>
-    <div class="fcol">
-      <div class="fcol-title">Topics Covered</div>
-      <ul class="flinks">
-        <li>Bones &amp; Muscles</li>
-        <li>Heart &amp; Blood</li>
-        <li>Vaccines &amp; Immunity</li>
-        <li>Fever &amp; Diseases</li>
-        <li>Nutrition &amp; Fat</li>
-        <li>Mental Health</li>
-      </ul>
-    </div>
-    <div class="fcol" id="contact-section">
-      <div class="fcol-title">Contact Us</div>
-      <ul class="fcontact">
-        <li><span class="ficon">👤</span><div><div class="fcontact-label">Developer</div><div class="fcontact-val">Devanshu Sharma</div></div></li>
-        <li><span class="ficon">✉️</span><div><div class="fcontact-label">Email</div><a class="fcontact-val flink" href="mailto:devanshusharmapc@gmail.com">Gmail</a></div></li>
-        <li><span class="ficon">🎓</span><div><div class="fcontact-label">Project Type</div><div class="fcontact-val">College Final Project</div></div></li>
-        <li><span class="ficon">📍</span><div><div class="fcontact-label">Location</div><div class="fcontact-val">Solan, Himachal Pradesh, India</div></div></li>
-      </ul>
+<div id="centre">
+  <div id="idle-hint">Ask me anything about your health</div>
+  <div id="answer-card">
+    <div id="answer-text"></div>
+    <div class="answer-footer">
+      <span class="src-tag" id="src-tag">HealthQ · AI</span>
+      <button id="speakBtn" onclick="toggleSpeak()">
+        <div class="speak-bars"><b></b><b></b><b></b></div>
+        Read aloud
+      </button>
     </div>
   </div>
-  <div class="footer-about" id="about-section">
-    <div class="about-inner">
-      <div class="about-title">About This Project</div>
-      <p class="about-text">Health-Tech is a college project built to make health information accessible to everyone. It gives conversational answers to your health questions in simple language. Features include voice search, text-to-speech, Hindi language support, a 3D interactive background, and 100+ built-in health facts. Built with Node.js, Express, and Three.js.</p>
-      <a href="report.html" class="report-link">Read Full Project Report →</a>
-      <div class="about-tags">
-        <span>Node.js</span><span>Express.js</span><span>Three.js</span><span>Groq AI</span><span>LLaMA 3 70B</span><span>HTML / CSS / JS</span>
-      </div>
-    </div>
-  </div>
-  <div class="footer-bottom">
-    <div class="footer-copy">© 2025 HealthQ · Built by <span class="lime">Devanshu Sharma</span> · College Project</div>
-    <div class="footer-note">Made with <span class="lime">♥</span> for learning</div>
-  </div>
-</footer>
+</div>
 
-<script>
-function scrollToTop(){window.scrollTo({top:0,behavior:'smooth'})}
-function focusChat(){window.scrollTo({top:0,behavior:'smooth'});setTimeout(()=>document.getElementById('questionInput').focus(),600)}
-function scrollToContact(){document.getElementById('contact-section').scrollIntoView({behavior:'smooth'})}
-function scrollToAbout(){document.getElementById('about-section').scrollIntoView({behavior:'smooth'})}
-</script>
+<div id="input-wrap">
+  <div class="ig">
+    <div class="ii">
+      <input id="qi" type="text" placeholder="Ask a health question…" autocomplete="off"/>
+      <button id="voiceBtn" title="Voice input">🎤</button>
+      <select id="langSelect" title="Language" onchange="onLangChange()">
+        <option value="en">🇬🇧 EN</option>
+        <option value="hi">🇮🇳 HI</option>
+      </select>
+      <button id="askBtn" onclick="ask()">Ask</button>
+    </div>
+  </div>
+  <div id="hint">Press Enter · Click Ask · or use Voice</div>
+</div>
 
+<!-- ═══ 3D SCENE — Siri-Style Morph Orb ═══ -->
 <script>
-// ══════════════════════════════════════════
-//  3D SCENE — Atom / Orbital Sphere
-// ══════════════════════════════════════════
+window.aiState='idle';
 (function(){
-  const canvas = document.getElementById('bg');
-  const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
+  const canvas=document.getElementById('bg');
+  const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
   renderer.setPixelRatio(Math.min(devicePixelRatio,2));
   renderer.setSize(innerWidth,innerHeight);
   renderer.setClearColor(0,0);
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.2;
+  renderer.toneMapping=THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure=1.5;
+  const scene=new THREE.Scene();
+  scene.fog=new THREE.FogExp2(0x04060f,0.010);
+  const camera=new THREE.PerspectiveCamera(42,innerWidth/innerHeight,0.1,200);
+  camera.position.set(0,0,24);
+  scene.add(new THREE.AmbientLight(0xffffff,0.06));
+  const ptB=new THREE.PointLight(0x4facfe,5,60); ptB.position.set(10,8,8); scene.add(ptB);
+  const ptL=new THREE.PointLight(0xb9ff66,4,55); ptL.position.set(-10,-6,7); scene.add(ptL);
+  const ptP=new THREE.PointLight(0xa78bfa,3,50); ptP.position.set(0,10,-6); scene.add(ptP);
 
-  const scene = new THREE.Scene();
-  scene.fog = new THREE.FogExp2(0x04060f, 0.018);
+  const VS=`
+    uniform float uTime; uniform float uAmp;
+    varying vec3 vN; varying float vDisp;
+    void main(){
+      vec3 p=position;
+      float d=sin(p.x*3.2+uTime*1.1)*cos(p.y*2.9+uTime*.85)*sin(p.z*2.6+uTime*1.3);
+      d+=sin(p.x*6.1-uTime*.65)*cos(p.y*5.2+uTime*1.35)*.38;
+      d+=sin(p.x*1.4+uTime*.38)*sin(p.y*2.1-uTime*.55)*cos(p.z*1.9+uTime*.78)*.55;
+      d+=cos(p.x*9.0-uTime*1.8)*sin(p.y*8.5+uTime*2.1)*.15;
+      vDisp=d; vN=normalize(normal);
+      gl_Position=projectionMatrix*modelViewMatrix*vec4(position+normal*d*uAmp,1.0);
+    }`;
+  const FS=`
+    uniform vec3 uCA,uCB; uniform float uOp;
+    varying vec3 vN; varying float vDisp;
+    void main(){
+      float rim=pow(1.0-abs(dot(vN,vec3(0,0,1))),1.7);
+      float t=clamp((vDisp+1.0)*.5,0.0,1.0);
+      vec3 col=mix(uCA,uCB,t+rim*.55);
+      gl_FragColor=vec4(col*(.45+rim*.85+t*.3),uOp*(.5+rim*.5));
+    }`;
+  const FSi=`
+    uniform vec3 uCA,uCB; uniform float uOp;
+    varying vec3 vN; varying float vDisp;
+    void main(){
+      float rim=pow(1.0-abs(dot(vN,vec3(0,0,1))),1.3);
+      float t=clamp((vDisp+1.0)*.5,0.0,1.0);
+      vec3 col=mix(uCA,uCB,t*.7+rim*.3);
+      gl_FragColor=vec4(col*(.7+rim*.9+t*.25),uOp*(.45+rim*.55));
+    }`;
 
-  const camera = new THREE.PerspectiveCamera(50,innerWidth/innerHeight,0.1,200);
-  camera.position.set(0,0,32);
+  function mkU(ca,cb,op){return{uTime:{value:0},uAmp:{value:.38},uCA:{value:new THREE.Color(ca)},uCB:{value:new THREE.Color(cb)},uOp:{value:op}};}
+  const uO=mkU(0xb9ff66,0x4facfe,.82);
+  const orb=new THREE.Mesh(new THREE.SphereGeometry(4.2,96,96),new THREE.ShaderMaterial({vertexShader:VS,fragmentShader:FS,uniforms:uO,transparent:true,depthWrite:false}));
+  scene.add(orb);
+  const uI=mkU(0xffffff,0xb9ff66,.55);
+  const iOrb=new THREE.Mesh(new THREE.SphereGeometry(3.1,64,64),new THREE.ShaderMaterial({vertexShader:VS,fragmentShader:FSi,uniforms:uI,transparent:true,depthWrite:false}));
+  scene.add(iOrb);
+  scene.add(new THREE.Mesh(new THREE.SphereGeometry(7,32,32),new THREE.MeshBasicMaterial({color:0x4facfe,transparent:true,opacity:.025,side:THREE.BackSide})));
+  scene.add(new THREE.Mesh(new THREE.SphereGeometry(10,32,32),new THREE.MeshBasicMaterial({color:0xb9ff66,transparent:true,opacity:.012,side:THREE.BackSide})));
 
-  scene.add(new THREE.AmbientLight(0xffffff,0.1));
-  const ptBlue = new THREE.PointLight(0x4facfe,3,40);
-  ptBlue.position.set(8,6,4); scene.add(ptBlue);
-  const ptLime = new THREE.PointLight(0xb9ff66,2,40);
-  ptLime.position.set(-8,-4,6); scene.add(ptLime);
-  const ptPurple = new THREE.PointLight(0xa78bfa,2,35);
-  ptPurple.position.set(0,8,-4); scene.add(ptPurple);
-
-  const coreGeo = new THREE.SphereGeometry(1.4,32,32);
-  const coreMat = new THREE.MeshStandardMaterial({color:0xb9ff66,emissive:0xb9ff66,emissiveIntensity:0.4,metalness:0.1,roughness:0.3,transparent:true,opacity:0.9});
-  const core = new THREE.Mesh(coreGeo,coreMat);
-  scene.add(core);
-
-  scene.add(new THREE.Mesh(
-    new THREE.SphereGeometry(2.2,32,32),
-    new THREE.MeshBasicMaterial({color:0xb9ff66,transparent:true,opacity:0.04,side:THREE.BackSide})
-  ));
-
-  function makeRing(radius,rx,ry,color,opacity){
-    const geo = new THREE.TorusGeometry(radius,0.025,12,120);
-    const mat = new THREE.MeshBasicMaterial({color,transparent:true,opacity});
-    const ring = new THREE.Mesh(geo,mat);
-    ring.rotation.x=rx; ring.rotation.y=ry;
-    scene.add(ring); return ring;
+  const NRINGS=10,wR=[];
+  for(let i=0;i<NRINGS;i++){
+    const m=new THREE.MeshBasicMaterial({color:0xb9ff66,transparent:true,opacity:0,depthWrite:false});
+    const mesh=new THREE.Mesh(new THREE.TorusGeometry(1,.018,8,120),m);
+    mesh.userData.phase=i/NRINGS; scene.add(mesh); wR.push(mesh);
   }
-  const ring1 = makeRing(5.5,Math.PI/2,0,0x4facfe,0.25);
-  const ring2 = makeRing(7.0,Math.PI/4,Math.PI/5,0xa78bfa,0.18);
-  const ring3 = makeRing(8.8,-Math.PI/3,Math.PI/3,0xb9ff66,0.12);
 
-  function orbitNode(ring,t,color){
-    const mesh = new THREE.Mesh(
-      new THREE.SphereGeometry(0.16,8,8),
-      new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:0.8,roughness:0.2,metalness:0.5})
-    );
-    ring.add(mesh); return {mesh,t};
+  function mkP(n,r0,r1,col,sz,op){
+    const pos=new Float32Array(n*3);
+    for(let i=0;i<n;i++){const r=r0+Math.random()*(r1-r0),th=Math.random()*Math.PI*2,ph=Math.acos((Math.random()-.5)*2);pos[i*3]=r*Math.sin(ph)*Math.cos(th);pos[i*3+1]=r*Math.sin(ph)*Math.sin(th);pos[i*3+2]=r*Math.cos(ph);}
+    const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(pos,3));
+    return new THREE.Points(g,new THREE.PointsMaterial({color:col,size:sz,transparent:true,opacity:op,sizeAttenuation:true}));
   }
-  const nodes=[
-    orbitNode(ring1,0,0x4facfe), orbitNode(ring1,Math.PI,0x4facfe),
-    orbitNode(ring2,0,0xa78bfa), orbitNode(ring2,Math.PI*2/3,0xa78bfa),
-    orbitNode(ring3,0,0xb9ff66)
-  ];
-  function setNodePos(node,ring,speed){
-    node.t=(node.t||0)+speed;
-    const r=ring.geometry.parameters.radius;
-    node.mesh.position.set(Math.cos(node.t)*r,0,Math.sin(node.t)*r);
-  }
-
-  const pN=500, pPos=new Float32Array(pN*3);
-  for(let i=0;i<pN;i++){
-    const r=8+Math.random()*20,theta=Math.random()*Math.PI*2,phi=Math.acos((Math.random()-0.5)*2);
-    pPos[i*3]=r*Math.sin(phi)*Math.cos(theta);
-    pPos[i*3+1]=r*Math.sin(phi)*Math.sin(theta);
-    pPos[i*3+2]=r*Math.cos(phi);
-  }
-  const pGeo=new THREE.BufferGeometry();
-  pGeo.setAttribute('position',new THREE.BufferAttribute(pPos,3));
-  const particles=new THREE.Points(pGeo,new THREE.PointsMaterial({color:0x4facfe,size:0.07,transparent:true,opacity:0.45,sizeAttenuation:true}));
-  scene.add(particles);
-
-  const pPos2=new Float32Array(200*3);
-  for(let i=0;i<200;i++){pPos2[i*3]=(Math.random()-0.5)*50;pPos2[i*3+1]=(Math.random()-0.5)*40;pPos2[i*3+2]=(Math.random()-0.5)*30-5}
-  const pGeo2=new THREE.BufferGeometry();
-  pGeo2.setAttribute('position',new THREE.BufferAttribute(pPos2,3));
-  scene.add(new THREE.Points(pGeo2,new THREE.PointsMaterial({color:0xa78bfa,size:0.05,transparent:true,opacity:0.25})));
+  const p1=mkP(700,12,30,0x4facfe,.065,.4),p2=mkP(350,8,45,0xa78bfa,.045,.22),p3=mkP(200,5,12,0xb9ff66,.05,.18);
+  scene.add(p1);scene.add(p2);scene.add(p3);
 
   let mx=0,my=0,tmx=0,tmy=0;
-  document.addEventListener('mousemove',e=>{tmx=(e.clientX/innerWidth-0.5)*2;tmy=(e.clientY/innerHeight-0.5)*2});
+  document.addEventListener('mousemove',e=>{tmx=(e.clientX/innerWidth-.5)*2;tmy=(e.clientY/innerHeight-.5)*2});
   window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
 
-  let t=0,pulse=0;
+  let curAmp=.38,curSpd=1,wTimer=0,t=0;
+  const tC1=new THREE.Color(0xb9ff66),tC2=new THREE.Color(0x4facfe);
   (function loop(){
     requestAnimationFrame(loop);
-    t+=0.005; pulse+=0.03;
-    mx+=(tmx-mx)*0.04; my+=(tmy-my)*0.04;
-    const p=1+Math.sin(pulse)*0.06;
-    core.scale.set(p,p,p);
-    coreMat.emissiveIntensity=0.3+Math.sin(pulse)*0.15;
-    ring1.rotation.z=t*0.35;
-    ring2.rotation.z=-t*0.22;
-    ring3.rotation.y=t*0.18;
-    setNodePos(nodes[0],ring1,0.018);
-    setNodePos(nodes[1],ring1,0.018);
-    setNodePos(nodes[2],ring2,0.013);
-    setNodePos(nodes[3],ring2,0.013);
-    setNodePos(nodes[4],ring3,0.009);
-    particles.rotation.y=t*0.04;
-    particles.rotation.x=t*0.01;
-    camera.position.x+=(mx*5-camera.position.x)*0.03;
-    camera.position.y+=(-my*3.5-camera.position.y)*0.03;
+    const st=window.aiState||'idle';
+    let ta,ts,wc1=0xb9ff66,wc2=0x4facfe,wOn=false;
+    if(st==='speaking'){ta=.80;ts=2.4;wOn=true;wc1=0xb9ff66;wc2=0x00ffaa;}
+    else if(st==='thinking'){ta=.58;ts=1.6;wc1=0x4facfe;wc2=0xa78bfa;}
+    else{ta=.34;ts=.75;}
+    tC1.set(wc1);tC2.set(wc2);
+    curAmp+=(ta-curAmp)*.038; curSpd+=(ts-curSpd)*.038;
+    t+=.005*curSpd;
+    uO.uTime.value=t; uO.uAmp.value=curAmp;
+    uO.uCA.value.lerp(tC1,.03); uO.uCB.value.lerp(tC2,.03);
+    uI.uTime.value=t*1.15; uI.uAmp.value=curAmp*.6;
+    uI.uCA.value.lerp(new THREE.Color(0xffffff),.02); uI.uCB.value.lerp(tC1,.03);
+    orb.rotation.y=t*.07; orb.rotation.x=t*.035;
+    iOrb.rotation.y=-t*.055; iOrb.rotation.x=-t*.028;
+    wTimer+=.016;
+    wR.forEach(r=>{
+      if(wOn){const p=((wTimer*.55+r.userData.phase)%1);r.scale.setScalar(4.2+p*13);r.material.opacity=(1-p)*(.28+curAmp*.18);r.material.color.set(wc1);r.rotation.x=Math.sin(r.userData.phase*6+t*.3)*.5;r.rotation.y=Math.cos(r.userData.phase*5+t*.2)*.4;}
+      else{r.material.opacity*=.93;}
+    });
+    ptB.position.x=Math.cos(t*.7)*14; ptB.position.z=Math.sin(t*.5)*10;
+    ptL.position.x=Math.cos(t*.6+Math.PI)*12; ptL.position.y=Math.sin(t*.45)*8;
+    ptB.intensity=4+curAmp*4; ptL.intensity=3+curAmp*3;
+    p1.rotation.y=t*.022; p1.rotation.x=t*.007;
+    p2.rotation.y=-t*.015; p2.rotation.z=t*.01;
+    mx+=(tmx-mx)*.04; my+=(tmy-my)*.04;
+    camera.position.x+=(mx*4.5-camera.position.x)*.03;
+    camera.position.y+=(-my*3.5-camera.position.y)*.03;
     camera.lookAt(0,0,0);
-    ptBlue.position.x=Math.cos(t)*12;
-    ptBlue.position.z=Math.sin(t)*8;
-    ptLime.position.x=Math.cos(t+Math.PI)*10;
-    ptLime.position.y=Math.sin(t*0.7)*6;
     renderer.render(scene,camera);
   })();
 })();
 </script>
 
+<!-- ═══ APP LOGIC ═══ -->
 <script>
-// ══════════════════════════════════════════
-//  CUSTOM CURSOR
-// ══════════════════════════════════════════
 const isTouch=('ontouchstart' in window)||navigator.maxTouchPoints>0;
-const dot=document.getElementById('cursor');
-const ring=document.getElementById('cursor-ring');
+const dot=document.getElementById('cursor'),ring=document.getElementById('cursor-ring');
 if(!isTouch){
   let dx=0,dy=0,rx=0,ry=0;
   document.addEventListener('mousemove',e=>{dx=e.clientX;dy=e.clientY});
-  (function loop(){
-    requestAnimationFrame(loop);
-    rx+=(dx-rx)*0.10; ry+=(dy-ry)*0.10;
-    dot.style.left=dx+'px'; dot.style.top=dy+'px';
-    ring.style.left=rx+'px'; ring.style.top=ry+'px';
-  })();
-  document.querySelectorAll('button,.chip,input,select').forEach(el=>{
+  (function loop(){requestAnimationFrame(loop);rx+=(dx-rx)*.10;ry+=(dy-ry)*.10;dot.style.left=dx+'px';dot.style.top=dy+'px';ring.style.left=rx+'px';ring.style.top=ry+'px';})();
+  document.querySelectorAll('button,input,select').forEach(el=>{
     el.addEventListener('mouseenter',()=>{dot.classList.add('hover');ring.classList.add('hover')});
     el.addEventListener('mouseleave',()=>{dot.classList.remove('hover');ring.classList.remove('hover')});
   });
-}else{
-  dot.style.display='none'; ring.style.display='none';
-  document.body.style.cursor='auto';
 }
 
-// ══════════════════════════════════════════
-//  APP — CHAT
-// ══════════════════════════════════════════
 const API='';
+let currentLang='en', lastAnswer='';
 
-let currentLang='en';
-let chatHistory=[];      // full Groq-format message history [{role,content},...]
-let activeSpeakBtn=null; // currently playing speak button
-
-// ── Language switcher ──────────────────────────────────────────────────────
-function onLangChange(){
-  currentLang=document.getElementById('langSelect').value;
-  if(rec) rec.lang=currentLang==='hi'?'hi-IN':'en-IN';
-  const inp=document.getElementById('questionInput');
-  const hint=document.getElementById('vhint');
-  const askBtn=document.getElementById('askBtn');
-  const clearBtn=document.querySelector('.clear-btn');
-  if(currentLang==='hi'){
-    inp.placeholder='कोई भी स्वास्थ्य प्रश्न पूछें…';
-    hint.textContent='Enter दबाएं · Ask करें · या Voice उपयोग करें';
-    askBtn.textContent='पूछें';
-    if(clearBtn) clearBtn.textContent='✕ चैट साफ़ करें';
-    const wTitle=document.querySelector('.welcome-title');
-    const wSub=document.querySelector('.welcome-sub');
-    if(wTitle) wTitle.textContent='HealthQ तैयार है';
-    if(wSub) wSub.textContent='कोई भी स्वास्थ्य सवाल पूछें। मैं बातचीत याद रखता हूँ और आगे के सवालों का जवाब भी दे सकता हूँ।';
-  } else {
-    inp.placeholder='Ask a health question…';
-    hint.textContent='Press Enter · Click Ask · or use Voice';
-    askBtn.textContent='Ask';
-    if(clearBtn) clearBtn.textContent='✕ Clear chat';
-    const wTitle=document.querySelector('.welcome-title');
-    const wSub=document.querySelector('.welcome-sub');
-    if(wTitle) wTitle.textContent='HealthQ is ready';
-    if(wSub) wSub.textContent='Ask me anything about your health. I remember the conversation so you can ask follow-up questions naturally.';
-  }
+function setAIState(s){
+  window.aiState=s;
+  const lbl=document.getElementById('state-label');
+  document.getElementById('state-text').textContent=s==='thinking'?'Thinking…':s==='speaking'?'Speaking':'Idle';
+  lbl.className=s==='idle'?'':s;
 }
 
-// ── Enter key ──────────────────────────────────────────────────────────────
-document.getElementById('questionInput').addEventListener('keydown',e=>{if(e.key==='Enter') ask()});
-
-// ── Voice ──────────────────────────────────────────────────────────────────
-const vBtn=document.getElementById('voiceBtn');
-const vHint=document.getElementById('vhint');
-const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-let rec=null,listening=false;
-if(SR){
-  rec=new SR(); rec.lang='en-IN'; rec.interimResults=true;
-  rec.onstart=()=>{listening=true;vBtn.classList.add('listening');vBtn.textContent='🔴';vHint.textContent='🎤 Listening...';vHint.classList.add('red')};
-  rec.onresult=e=>{
-    const txt=Array.from(e.results).map(r=>r[0].transcript).join('');
-    document.getElementById('questionInput').value=txt;
-    if(e.results[0].isFinal){vHint.textContent='Got it!';setTimeout(ask,400)}
-  };
-  rec.onerror=()=>{vHint.textContent='Could not hear. Try again!';stopVoice()};
-  rec.onend=stopVoice;
-  vBtn.addEventListener('click',()=>listening?rec.stop():rec.start());
-}else{
-  vBtn.addEventListener('click',()=>{vHint.textContent='Use Chrome or Edge for voice!';vHint.classList.add('red');setTimeout(()=>vHint.classList.remove('red'),3000)});
-}
-function stopVoice(){
-  listening=false;vBtn.classList.remove('listening');vBtn.textContent='🎤';vHint.classList.remove('red');
-  setTimeout(()=>{vHint.textContent=currentLang==='hi'?'Enter दबाएं · Ask करें · या Voice उपयोग करें':'Press Enter · Click Ask · or use Voice'},2500);
-}
-
-// ── TTS ────────────────────────────────────────────────────────────────────
-function speakText(text, btn){
-  speechSynthesis.cancel();
-  if(activeSpeakBtn && activeSpeakBtn!==btn) activeSpeakBtn.classList.remove('on');
-  const u=new SpeechSynthesisUtterance(text);
-  u.lang=currentLang==='hi'?'hi-IN':'en-IN';
-  u.rate=0.93; u.pitch=1;
-  u.onstart=()=>{btn.classList.add('on'); activeSpeakBtn=btn};
-  u.onend=()=>{btn.classList.remove('on'); activeSpeakBtn=null};
-  speechSynthesis.speak(u);
-}
-function toggleSpeak(text, btn){
-  if(speechSynthesis.speaking && activeSpeakBtn===btn){
-    speechSynthesis.cancel(); btn.classList.remove('on'); activeSpeakBtn=null;
-  } else {
-    speakText(text, btn);
-  }
-}
-
-// ── Append message to chat ─────────────────────────────────────────────────
-function appendMessage(role, text, source){
-  // Hide welcome screen on first message
-  const welcome=document.getElementById('chatWelcome');
-  if(welcome) welcome.remove();
-
-  const win=document.getElementById('chatWindow');
-  const row=document.createElement('div');
-  row.className='msg-row '+role;
-
-  if(role==='user'){
-    row.innerHTML=`<div class="msg-bubble"><span>${escHtml(text)}</span></div>`;
-  } else {
-    const srcLabel = source==='ai'
-      ? (currentLang==='hi'?'Groq AI · LLaMA 3 70B':'Groq AI · LLaMA 3 70B')
-      : (currentLang==='hi'?'स्वास्थ्य डेटाबेस':'Health Database');
-    const msgId='msg-'+Date.now();
-    row.innerHTML=`
-      <div class="msg-bubble">
-        <div class="msg-meta">
-          <div class="msg-avatar">H</div>
-          <div class="msg-name">HealthQ</div>
-          <div class="msg-src">${srcLabel}</div>
-        </div>
-        <div id="${msgId}">${escHtml(text)}</div>
-        <button class="msg-speak" onclick="toggleSpeak(this.dataset.text, this)">
-          <div class="speak-bars"><b></b><b></b><b></b></div>
-          Read
-        </button>
-      </div>`;
-    // Set speak button data after render
-    setTimeout(()=>{
-      const speakBtn=row.querySelector('.msg-speak');
-      if(speakBtn) speakBtn.dataset.text=text;
-    },0);
-  }
-
-  win.appendChild(row);
-  win.scrollTop=win.scrollHeight;
-  return row;
-}
-
-function escHtml(t){
-  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br/>');
-}
-
-// ── Typewriter into an existing element ────────────────────────────────────
-function typewriterInto(el, text, onDone){
+function showAnswer(text,source){
+  lastAnswer=text;
+  const card=document.getElementById('answer-card');
+  const el=document.getElementById('answer-text');
+  document.getElementById('src-tag').textContent=source==='ai'?'Groq AI · LLaMA 3 70B':source==='wikipedia'?'Wikipedia · Health Article':'HealthQ · Database';
+  document.getElementById('idle-hint').style.opacity='0';
+  card.classList.remove('visible');
   el.textContent='';
-  let i=0;
-  function tick(){
-    if(i<text.length){el.textContent+=text[i++];setTimeout(tick,14)}
-    else if(onDone) onDone();
-  }
+  void card.offsetWidth; // reflow
+  card.classList.add('visible');
+  typewriterInto(el,text,()=>setTimeout(()=>doSpeak(text),200));
+}
+
+function hideAnswer(){
+  document.getElementById('answer-card').classList.remove('visible');
+  document.getElementById('idle-hint').style.opacity='1';
+}
+
+function typewriterInto(el,text,onDone){
+  el.textContent='';let i=0;
+  function tick(){if(i<text.length){el.textContent+=text[i++];setTimeout(tick,13)}else if(onDone)onDone();}
   tick();
 }
 
-// ── Show typing indicator ──────────────────────────────────────────────────
-function showTyping(){
-  const win=document.getElementById('chatWindow');
-  const row=document.createElement('div');
-  row.className='typing-row'; row.id='typingRow';
-  row.innerHTML=`<div class="typing-bubble"><div class="msg-meta"><div class="msg-avatar">H</div><div class="msg-name">HealthQ</div></div><div class="thinking"><span></span><span></span><span></span></div></div>`;
-  win.appendChild(row);
-  win.scrollTop=win.scrollHeight;
-}
-function removeTyping(){
-  const r=document.getElementById('typingRow');
-  if(r) r.remove();
-}
-
-// ── Clear chat ─────────────────────────────────────────────────────────────
-function clearChat(){
-  chatHistory=[];
-  const win=document.getElementById('chatWindow');
-  win.innerHTML=`<div class="chat-welcome" id="chatWelcome">
-    <div class="welcome-icon">🩺</div>
-    <div class="welcome-title">HealthQ is ready</div>
-    <div class="welcome-sub">Ask me anything about your health. I remember the conversation so you can ask follow-up questions naturally.</div>
-  </div>`;
+const speakBtn=document.getElementById('speakBtn');
+function doSpeak(text){
   speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang=currentLang==='hi'?'hi-IN':'en-IN';
+  u.rate=.92;u.pitch=1;
+  u.onstart=()=>{speakBtn.classList.add('on');setAIState('speaking')};
+  u.onend=()=>{speakBtn.classList.remove('on');setAIState('idle')};
+  u.onerror=()=>{speakBtn.classList.remove('on');setAIState('idle')};
+  speechSynthesis.speak(u);
+}
+function toggleSpeak(){
+  if(speechSynthesis.speaking){speechSynthesis.cancel();speakBtn.classList.remove('on');setAIState('idle');}
+  else if(lastAnswer){doSpeak(lastAnswer);}
 }
 
-// ── Main ask function ──────────────────────────────────────────────────────
+function onLangChange(){
+  currentLang=document.getElementById('langSelect').value;
+  if(rec) rec.lang=currentLang==='hi'?'hi-IN':'en-IN';
+  const qi=document.getElementById('qi'),hint=document.getElementById('hint');
+  if(currentLang==='hi'){
+    qi.placeholder='कोई भी स्वास्थ्य प्रश्न पूछें…';
+    hint.textContent='Enter दबाएं · Ask करें · या Voice उपयोग करें';
+    document.getElementById('askBtn').textContent='पूछें';
+    document.getElementById('idle-hint').textContent='अपने स्वास्थ्य के बारे में कुछ भी पूछें';
+  } else {
+    qi.placeholder='Ask a health question…';
+    hint.textContent='Press Enter · Click Ask · or use Voice';
+    document.getElementById('askBtn').textContent='Ask';
+    document.getElementById('idle-hint').textContent='Ask me anything about your health';
+  }
+}
+document.getElementById('qi').addEventListener('keydown',e=>{if(e.key==='Enter')ask()});
+
+const vBtn=document.getElementById('voiceBtn'),hintEl=document.getElementById('hint');
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+let rec=null,listening=false;
+if(SR){
+  rec=new SR();rec.lang='en-IN';rec.interimResults=true;
+  rec.onstart=()=>{listening=true;vBtn.classList.add('listening');vBtn.textContent='🔴';hintEl.textContent='🎤 Listening...';hintEl.classList.add('red')};
+  rec.onresult=e=>{const txt=Array.from(e.results).map(r=>r[0].transcript).join('');document.getElementById('qi').value=txt;if(e.results[0].isFinal){hintEl.textContent='Got it!';setTimeout(ask,400)}};
+  rec.onerror=()=>{hintEl.textContent='Could not hear. Try again!';stopVoice()};
+  rec.onend=stopVoice;
+  vBtn.addEventListener('click',()=>listening?rec.stop():rec.start());
+} else {
+  vBtn.addEventListener('click',()=>{hintEl.textContent='Use Chrome or Edge for voice!';hintEl.classList.add('red');setTimeout(()=>hintEl.classList.remove('red'),3000)});
+}
+function stopVoice(){
+  listening=false;vBtn.classList.remove('listening');vBtn.textContent='🎤';hintEl.classList.remove('red');
+  setTimeout(()=>{hintEl.textContent=currentLang==='hi'?'Enter दबाएं · Ask करें · या Voice उपयोग करें':'Press Enter · Click Ask · or use Voice'},2500);
+}
+
 async function ask(){
-  const inp=document.getElementById('questionInput');
+  const inp=document.getElementById('qi');
   const question=inp.value.trim();
   if(!question) return inp.focus();
-
   inp.value='';
   speechSynthesis.cancel();
-
+  speakBtn.classList.remove('on');
+  setAIState('thinking');
+  hideAnswer();
   const btn=document.getElementById('askBtn');
-  btn.disabled=true; btn.textContent='…';
-
-  // Add user message to UI and history
-  appendMessage('user', question);
-  chatHistory.push({role:'user', content: question});
-
-  // Show typing indicator
-  showTyping();
-
+  btn.disabled=true;btn.textContent='…';
   try{
-    const res=await fetch(`${API}/api/ask`,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({question, messages: chatHistory, language: currentLang})
-    });
+    const res=await fetch(`${API}/api/ask`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question,language:currentLang})});
     const data=await res.json();
-    removeTyping();
-
-    if(data.success){
-      // Add AI reply to history
-      chatHistory.push({role:'assistant', content: data.answer});
-
-      // Append AI message with typewriter effect
-      const win=document.getElementById('chatWindow');
-      // Hide welcome if still showing
-      const welcome=document.getElementById('chatWelcome');
-      if(welcome) welcome.remove();
-
-      const row=document.createElement('div');
-      row.className='msg-row ai';
-      const srcLabel = data.source==='ai'
-        ? (currentLang==='hi'?'Groq AI · LLaMA 3 70B':'Groq AI · LLaMA 3 70B')
-        : data.source==='wikipedia'
-        ? (currentLang==='hi'?'Wikipedia · स्वास्थ्य लेख':'Wikipedia · Health Article')
-        : (currentLang==='hi'?'स्वास्थ्य डेटाबेस':'Health Database');
-      row.innerHTML=`
-        <div class="msg-bubble">
-          <div class="msg-meta">
-            <div class="msg-avatar">H</div>
-            <div class="msg-name">HealthQ</div>
-            <div class="msg-src">${srcLabel}</div>
-          </div>
-          <div class="msg-text"></div>
-          <button class="msg-speak" onclick="toggleSpeak(this.dataset.text, this)">
-            <div class="speak-bars"><b></b><b></b><b></b></div>
-            <span class="speak-label">${currentLang==='hi'?'पढ़ें':'Read'}</span>
-          </button>
-        </div>`;
-      win.appendChild(row);
-      win.scrollTop=win.scrollHeight;
-
-      const textEl=row.querySelector('.msg-text');
-      const speakBtn=row.querySelector('.msg-speak');
-
-      typewriterInto(textEl, data.answer, ()=>{
-        speakBtn.dataset.text=data.answer;
-        // Auto-read the answer
-        setTimeout(()=>speakText(data.answer, speakBtn), 300);
-        win.scrollTop=win.scrollHeight;
-      });
-
-    } else {
-      showError(data.error||'Something went wrong.');
-    }
+    setAIState('idle');
+    if(data.success){showAnswer(data.answer,data.source);}
+    else{showAnswer(data.error||'Something went wrong. Please try again.','error');}
   } catch(e){
-    removeTyping();
-    showError('Cannot reach server. Make sure it is running: node server.js');
+    setAIState('idle');
+    showAnswer('Cannot reach server. Make sure it is running: node server.js','error');
   }
-
-  btn.disabled=false; btn.textContent='Ask';
-}
-
-function showError(msg){
-  const win=document.getElementById('chatWindow');
-  const row=document.createElement('div');
-  row.className='err-row';
-  row.innerHTML=`<div class="err-bubble"><span>⚠️</span><span>${escHtml(msg)}</span></div>`;
-  win.appendChild(row);
-  win.scrollTop=win.scrollHeight;
+  btn.disabled=false;btn.textContent=currentLang==='hi'?'पूछें':'Ask';
 }
 </script>
-
 </body>
 </html>
