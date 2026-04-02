@@ -119,6 +119,35 @@ async function groqDirectAnswer(messages, language) {
 }
 
 // ══════════════════════════════════════════════════════════════
+//  HEALTH TOPIC CHECKER — filter non-health questions
+// ══════════════════════════════════════════════════════════════
+async function isHealthRelated(question) {
+  try {
+    const completion = await groq.chat.completions.create({
+      model: "llama-3.1-8b-instant",
+      max_tokens: 10,
+      messages: [
+        {
+          role: "system",
+          content: `You are a classifier. Reply with only "yes" or "no".
+Is the given question related to health, medicine, body, disease, nutrition, mental health, fitness, symptoms, anatomy, or medical topics?
+Reply "yes" if it is health related. Reply "no" if it is about anything else like politics, sports, entertainment, technology, history, etc.`
+        },
+        {
+          role: "user",
+          content: question
+        }
+      ]
+    });
+    const reply = completion.choices[0].message.content.trim().toLowerCase();
+    return reply.includes("yes");
+  } catch (err) {
+    // If checker fails, allow the question through
+    return true;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
 //  ROUTES
 // ══════════════════════════════════════════════════════════════
 app.get("/", (req, res) => {
@@ -138,6 +167,15 @@ app.post("/api/ask", async (req, res) => {
     }
 
     console.log("Question:", question, "| Language:", lang);
+
+    // Step 0: Check if question is health related
+    const healthCheck = await isHealthRelated(question);
+    if (!healthCheck) {
+      const notHealthMsg = lang === "hi"
+        ? "मैं केवल स्वास्थ्य से संबंधित सवालों का जवाब दे सकता हूँ। कृपया कोई स्वास्थ्य प्रश्न पूछें जैसे बुखार, मधुमेह, हृदय, पोषण आदि।"
+        : "I can only answer health-related questions. Please ask me something about health, medicine, symptoms, nutrition, fitness, or the human body.";
+      return res.json({ success: true, question, answer: notHealthMsg, source: "filter" });
+    }
 
     // Step 1: Try Wikipedia
     let wikiResult = null;
