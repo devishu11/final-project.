@@ -143,18 +143,23 @@ html[data-theme='light'] body{
 #answer-text{
   width:100%;
   flex:1;
-  font-size:16px;
+  font-size:clamp(13px,1.85vw,16px);
   font-weight:500;
-  line-height:1.45;
+  line-height:1.42;
   color:var(--orb-text);
   text-align:center;
   overflow:hidden;
-  white-space:nowrap;
-  text-overflow:ellipsis;
-  max-height:none;
+  white-space:normal;
+  word-break:break-word;
+  display:-webkit-box;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:5;
   padding-right:0;
   text-shadow:0 1px 10px rgba(0,0,0,.22);
 }
+#answer-text.len-md{font-size:14px;-webkit-line-clamp:6}
+#answer-text.len-lg{font-size:13px;-webkit-line-clamp:7}
+#answer-text.len-xl{font-size:12px;-webkit-line-clamp:8}
 .spoken-word{transition:color .12s, text-shadow .12s, transform .12s}
 .spoken-word.active{
   color:var(--lime);
@@ -303,6 +308,9 @@ html[data-theme='light'] #cursor{box-shadow:0 0 8px rgba(255,170,60,.75)}
   #centre{padding:calc(var(--safe-top) + 76px) 14px calc(var(--safe-bottom) + 136px)}
   #orb-answer{width:clamp(220px,72vw,322px);height:clamp(220px,72vw,322px);padding:52px 20px 18px}
   #answer-text{font-size:14px}
+  #answer-text.len-md{font-size:13px}
+  #answer-text.len-lg{font-size:12px}
+  #answer-text.len-xl{font-size:11px}
   .answer-footer{margin-top:4px;padding-top:8px}
   .src-tag{font-size:9px;letter-spacing:.6px}
   #input-wrap{width:calc(100vw - 14px)}
@@ -654,11 +662,19 @@ function updateIdleHint(){
 function formatSingleLineAnswer(text){
   const clean=(text||'').replace(/\s+/g,' ').trim();
   if(!clean) return 'I am here to help with your health questions.';
-  return clean.length>140 ? clean.slice(0,137).trimEnd()+'...' : clean;
+  return clean.length>260 ? clean.slice(0,257).trimEnd()+'...' : clean;
 }
 
 const answerEl=document.getElementById('answer-text');
 let speechWords=[], speechWordSpans=[], activeSpeechWord=-1;
+
+function applyAnswerSizing(text){
+  answerEl.classList.remove('len-md','len-lg','len-xl');
+  const n=(text||'').length;
+  if(n>210) answerEl.classList.add('len-xl');
+  else if(n>165) answerEl.classList.add('len-lg');
+  else if(n>115) answerEl.classList.add('len-md');
+}
 
 function buildSpeechWords(text){
   const words=[];
@@ -709,6 +725,7 @@ function endSpeechSync(){
   speechWords=[];
   speechWordSpans.length=0;
   activeSpeechWord=-1;
+  applyAnswerSizing(lastAnswer);
   answerEl.textContent=lastAnswer||'';
 }
 
@@ -736,6 +753,7 @@ function showAnswer(text,source){
   document.getElementById('idle-hint').style.opacity='0';
   card.classList.remove('visible');
   el.textContent='';
+  applyAnswerSizing(oneLineAnswer);
   void card.offsetWidth; // reflow
   card.classList.add('visible');
   typewriterInto(el,oneLineAnswer,()=>setTimeout(()=>doSpeak(oneLineAnswer),200));
