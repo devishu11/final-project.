@@ -81,7 +81,7 @@ health-project/
 **Devanshu Sharma**
 📧 devanshusharmapc@gmail.com
 📍 India
-🎓 College Final Project — 2026
+🎓 College Project — 2026
 
 ---
 
