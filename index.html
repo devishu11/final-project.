@@ -4,6 +4,14 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>HealthQ</title>
+<script>
+(()=>{try{
+  const key='healthq-theme';
+  const saved=localStorage.getItem(key);
+  const theme=saved||(window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');
+  document.documentElement.setAttribute('data-theme',theme);
+}catch(_){}})();
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Urbanist:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <style>
@@ -29,19 +37,16 @@ body{
   font-family:'Urbanist',sans-serif;
   cursor:none;
 }
-
-@media (prefers-color-scheme:light){
-  :root{
-    --bg:#edf4ff;
-    --white:#0f172a;
-    --card-bg:rgba(255,255,255,.62);
-    --muted:rgba(15,23,42,.5);
-    --muted-soft:rgba(15,23,42,.35);
-    --hint:rgba(15,23,42,.55);
-    --input-bg:rgba(255,255,255,.85);
-    --input-option-bg:#f8fbff;
-    --orb-text:rgba(15,23,42,.9);
-  }
+html[data-theme='light']{
+  --bg:#edf4ff;
+  --white:#0f172a;
+  --card-bg:rgba(255,255,255,.62);
+  --muted:rgba(15,23,42,.5);
+  --muted-soft:rgba(15,23,42,.35);
+  --hint:rgba(15,23,42,.55);
+  --input-bg:rgba(255,255,255,.88);
+  --input-option-bg:#f8fbff;
+  --orb-text:rgba(15,23,42,.9);
 }
 
 /* Cursor */
@@ -56,6 +61,14 @@ body{
 
 /* Wordmark */
 #wordmark{position:fixed;top:28px;left:32px;z-index:10;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3.5px;color:var(--muted);pointer-events:none;}
+#themeBtn{
+  position:fixed;top:22px;left:50%;transform:translateX(-50%);
+  z-index:12;padding:8px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.2);
+  background:rgba(4,8,22,.55);color:var(--white);font:600 11px/1 'Urbanist',sans-serif;
+  letter-spacing:.8px;text-transform:uppercase;cursor:none;transition:all .2s;
+  backdrop-filter:blur(12px);
+}
+#themeBtn:hover{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.32)}
 
 /* State label */
 #state-label{position:fixed;top:28px;right:32px;z-index:10;display:flex;align-items:center;gap:7px;font-size:11px;letter-spacing:1.8px;text-transform:uppercase;color:var(--muted);transition:color .5s;pointer-events:none;}
@@ -85,43 +98,40 @@ body{
 
 /* Orb answer */
 #orb-answer{
-  width:min(430px,70vw);
-  height:min(430px,70vw);
+  width:min(360px,62vw);
+  height:min(360px,62vw);
   border-radius:50%;
-  border:1px solid rgba(185,255,102,.24);
-  background:
-    radial-gradient(circle at 30% 25%, rgba(185,255,102,.13), transparent 45%),
-    radial-gradient(circle at 70% 75%, rgba(79,172,254,.14), transparent 45%),
-    var(--card-bg);
-  backdrop-filter:blur(24px);
-  box-shadow:0 0 70px rgba(185,255,102,.1),0 30px 70px rgba(0,0,0,.35),inset 0 0 40px rgba(255,255,255,.05);
   opacity:0;
   transform:scale(.9);
   transition:opacity .55s cubic-bezier(.16,1,.3,1),transform .55s cubic-bezier(.16,1,.3,1);
   pointer-events:auto;
   display:flex;
   flex-direction:column;
-  justify-content:space-between;
-  padding:64px 46px 34px;
+  align-items:center;
+  justify-content:center;
+  gap:18px;
+  padding:72px 38px 44px;
 }
 #orb-answer.visible{opacity:1;transform:scale(1)}
 #answer-text{
-  font-size:15px;
+  width:100%;
+  font-size:16px;
   font-weight:500;
   line-height:1.7;
   color:var(--orb-text);
   text-align:center;
   overflow-y:auto;
-  max-height:58%;
+  max-height:62%;
   padding-right:4px;
+  text-shadow:0 1px 10px rgba(0,0,0,.22);
 }
 #answer-text::-webkit-scrollbar{width:3px}
 #answer-text::-webkit-scrollbar-track{background:transparent}
 #answer-text::-webkit-scrollbar-thumb{background:rgba(185,255,102,.3);border-radius:3px}
-.answer-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.12);}
-.src-tag{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);}
-#speakBtn{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.14);border-radius:999px;padding:6px 13px;font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:rgba(255,255,255,.72);cursor:none;font-family:'Urbanist',sans-serif;transition:all .2s;}
-#speakBtn:hover{color:var(--white);border-color:rgba(255,255,255,.28)}
+.answer-footer{display:flex;align-items:center;justify-content:center;gap:12px;}
+.src-tag{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted-soft);}
+#speakBtn{display:flex;align-items:center;gap:6px;background:transparent;border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:6px 13px;font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:rgba(255,255,255,.85);cursor:none;font-family:'Urbanist',sans-serif;transition:all .2s;}
+#speakBtn:hover{color:var(--white);border-color:rgba(255,255,255,.32);background:rgba(255,255,255,.06)}
 #speakBtn.on{color:var(--lime);border-color:rgba(185,255,102,.3);background:rgba(185,255,102,.05)}
 .speak-bars{display:flex;align-items:center;gap:1.5px;height:10px}
 .speak-bars b{display:block;width:2px;background:currentColor;border-radius:2px;height:3px}
@@ -152,55 +162,73 @@ body{
 #hint{text-align:center;font-size:11px;color:var(--hint);margin-top:10px;letter-spacing:.5px;transition:color .3s;}
 #hint.red{color:#f87171}
 
+html[data-theme='light'] #themeBtn{
+  background:rgba(255,255,255,.7);
+  border-color:rgba(15,23,42,.25);
+  color:#0f172a;
+}
+html[data-theme='light'] #themeBtn:hover{
+  background:rgba(255,255,255,.95);
+  border-color:rgba(15,23,42,.34);
+}
+
+html[data-theme='light']{
+  color-scheme:light;
+}
+html[data-theme='light'] #state-label.thinking{color:#1d68cc}
+html[data-theme='light'] #state-label.speaking{color:#3f7d1e}
+html[data-theme='light'] #answer-text{text-shadow:none}
+html[data-theme='light'] .src-tag{color:rgba(15,23,42,.55)}
+html[data-theme='light'] #speakBtn{
+  border-color:rgba(15,23,42,.28);
+  color:rgba(15,23,42,.78);
+}
+html[data-theme='light'] #speakBtn:hover{
+  color:#0f172a;
+  border-color:rgba(15,23,42,.38);
+  background:rgba(15,23,42,.06);
+}
+html[data-theme='light'] #voiceBtn{
+  background:rgba(15,23,42,.05);
+  border-color:rgba(15,23,42,.16);
+  color:rgba(15,23,42,.72);
+}
+html[data-theme='light'] #voiceBtn:hover{
+  background:rgba(15,23,42,.1);
+  border-color:rgba(15,23,42,.24);
+  color:#0f172a;
+}
+html[data-theme='light'] #qi::placeholder{color:rgba(15,23,42,.42)}
+html[data-theme='light'] #langSelect{
+  background:rgba(15,23,42,.06);
+  border-color:rgba(15,23,42,.2);
+  color:rgba(15,23,42,.78);
+}
+html[data-theme='light'] #state-dot{background:rgba(15,23,42,.28)}
+html[data-theme='light'] #cursor-ring{border-color:rgba(79,172,254,.4)}
+html[data-theme='light'] #cursor{box-shadow:0 0 8px rgba(79,172,254,.7)}
+
 @media (prefers-color-scheme:light){
-  #state-label.thinking{color:#1d68cc}
-  #state-label.speaking{color:#3f7d1e}
-  #orb-answer{
-    border-color:rgba(79,172,254,.36);
-    box-shadow:0 0 80px rgba(79,172,254,.22),0 24px 50px rgba(15,23,42,.12),inset 0 0 35px rgba(255,255,255,.35);
-  }
-  .answer-footer{border-top-color:rgba(15,23,42,.15)}
-  #speakBtn{
-    background:rgba(255,255,255,.55);
-    border-color:rgba(15,23,42,.22);
-    color:rgba(15,23,42,.78);
-  }
-  #speakBtn:hover{
-    color:#0f172a;
-    border-color:rgba(15,23,42,.32);
-  }
-  #voiceBtn{
-    background:rgba(15,23,42,.05);
-    border-color:rgba(15,23,42,.16);
-    color:rgba(15,23,42,.72);
-  }
-  #voiceBtn:hover{
-    background:rgba(15,23,42,.1);
-    border-color:rgba(15,23,42,.24);
-    color:#0f172a;
-  }
-  #qi::placeholder{color:rgba(15,23,42,.42)}
-  #langSelect{
-    background:rgba(15,23,42,.06);
-    border-color:rgba(15,23,42,.2);
-    color:rgba(15,23,42,.78);
+  html:not([data-theme]){
+    color-scheme:light;
   }
 }
 
 @media(max-width:600px){
   body{cursor:auto}#cursor,#cursor-ring{display:none!important}
-  #askBtn,#voiceBtn,#langSelect,#speakBtn{cursor:pointer}
+  #askBtn,#voiceBtn,#langSelect,#speakBtn,#themeBtn{cursor:pointer}
   .ii{padding:6px 6px 6px 16px;gap:6px}
   #qi{font-size:15px;padding:11px 0}
   #voiceBtn,#askBtn{width:42px;height:42px;font-size:13px}
   #askBtn{padding:11px 18px}
   #langSelect{height:42px;font-size:12px}
-  #orb-answer{width:min(340px,80vw);height:min(340px,80vw);padding:44px 28px 22px}
-  #answer-text{font-size:14px;max-height:54%}
+  #orb-answer{width:min(292px,80vw);height:min(292px,80vw);padding:58px 24px 30px}
+  #answer-text{font-size:14px;max-height:56%}
   #centre{padding:0 20px 130px}
   #input-wrap{bottom:24px}
   #wordmark{top:20px;left:20px;font-size:17px}
   #state-label{top:22px;right:20px}
+  #themeBtn{top:16px;padding:7px 12px;font-size:10px}
 }
 </style>
 </head>
@@ -211,6 +239,7 @@ body{
 <canvas id="bg"></canvas>
 
 <div id="wordmark">HEALTHQ</div>
+<button id="themeBtn" type="button">Light mode</button>
 
 <div id="state-label">
   <div id="state-dot"></div>
@@ -251,7 +280,7 @@ body{
 <script>
 window.aiState='idle';
 (function(){
-  const isLightTheme=window.matchMedia('(prefers-color-scheme: light)').matches;
+  const root=document.documentElement;
   const canvas=document.getElementById('bg');
   const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
   renderer.setPixelRatio(Math.min(devicePixelRatio,2));
@@ -260,7 +289,7 @@ window.aiState='idle';
   renderer.toneMapping=THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure=1.5;
   const scene=new THREE.Scene();
-  scene.fog=new THREE.FogExp2(isLightTheme?0xe8f1ff:0x04060f,isLightTheme?0.0075:0.010);
+  scene.fog=new THREE.FogExp2(0x04060f,0.010);
   const camera=new THREE.PerspectiveCamera(42,innerWidth/innerHeight,0.1,200);
   camera.position.set(0,0,24);
   scene.add(new THREE.AmbientLight(0xffffff,0.06));
@@ -306,8 +335,22 @@ window.aiState='idle';
   const uI=mkU(0xffffff,0xb9ff66,.55);
   const iOrb=new THREE.Mesh(new THREE.SphereGeometry(3.1,64,64),new THREE.ShaderMaterial({vertexShader:VS,fragmentShader:FSi,uniforms:uI,transparent:true,depthWrite:false}));
   scene.add(iOrb);
-  scene.add(new THREE.Mesh(new THREE.SphereGeometry(7,32,32),new THREE.MeshBasicMaterial({color:isLightTheme?0x60a5fa:0x4facfe,transparent:true,opacity:isLightTheme ? .048 : .025,side:THREE.BackSide})));
-  scene.add(new THREE.Mesh(new THREE.SphereGeometry(10,32,32),new THREE.MeshBasicMaterial({color:isLightTheme?0x86efac:0xb9ff66,transparent:true,opacity:isLightTheme ? .024 : .012,side:THREE.BackSide})));
+  const shellA=new THREE.MeshBasicMaterial({color:0x4facfe,transparent:true,opacity:.025,side:THREE.BackSide});
+  const shellB=new THREE.MeshBasicMaterial({color:0xb9ff66,transparent:true,opacity:.012,side:THREE.BackSide});
+  scene.add(new THREE.Mesh(new THREE.SphereGeometry(7,32,32),shellA));
+  scene.add(new THREE.Mesh(new THREE.SphereGeometry(10,32,32),shellB));
+
+  function applySceneTheme(theme){
+    const isLight=theme==='light';
+    scene.fog.color.setHex(isLight?0xe8f1ff:0x04060f);
+    scene.fog.density=isLight?0.0075:0.010;
+    shellA.color.setHex(isLight?0x60a5fa:0x4facfe);
+    shellA.opacity=isLight ? .048 : .025;
+    shellB.color.setHex(isLight?0x86efac:0xb9ff66);
+    shellB.opacity=isLight ? .024 : .012;
+  }
+  applySceneTheme(root.getAttribute('data-theme')==='light'?'light':'dark');
+  window.addEventListener('healthq-theme-change',e=>applySceneTheme(e.detail.theme));
 
   const NRINGS=10,wR=[];
   for(let i=0;i<NRINGS;i++){
@@ -368,6 +411,22 @@ window.aiState='idle';
 
 <!-- ═══ APP LOGIC ═══ -->
 <script>
+const THEME_KEY='healthq-theme';
+const themeBtn=document.getElementById('themeBtn');
+function applyTheme(theme){
+  document.documentElement.setAttribute('data-theme',theme);
+  try{localStorage.setItem(THEME_KEY,theme);}catch(_){}
+  if(themeBtn) themeBtn.textContent=theme==='light'?'Dark mode':'Light mode';
+  window.dispatchEvent(new CustomEvent('healthq-theme-change',{detail:{theme}}));
+}
+applyTheme(document.documentElement.getAttribute('data-theme')||'dark');
+if(themeBtn){
+  themeBtn.addEventListener('click',()=>{
+    const current=document.documentElement.getAttribute('data-theme')||'dark';
+    applyTheme(current==='dark'?'light':'dark');
+  });
+}
+
 const isTouch=('ontouchstart' in window)||navigator.maxTouchPoints>0;
 const dot=document.getElementById('cursor'),ring=document.getElementById('cursor-ring');
 if(!isTouch){
