@@ -11,8 +11,7 @@ A web-based health question and answer platform that gives simple, clear answers
 
 ## ✨ Features
 
-- 🤖 **AI-Powered Answers** — Uses Groq AI + LLaMA 3 for smart responses
-- 📚 **100+ Built-in Health Facts** — Instant answers from a static database
+- 📚 **Built-in Health Facts** — Instant answers from a static database
 - 🎤 **Voice Search** — Speak your question using Web Speech API
 - 🔊 **Text to Speech** — Answers are read aloud automatically
 - 🌐 **3D Background** — Interactive Three.js orbital atom scene
