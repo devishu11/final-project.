@@ -346,6 +346,7 @@ window.aiState='idle';
   scene.add(new THREE.Mesh(new THREE.SphereGeometry(7,32,32),shellA));
   scene.add(new THREE.Mesh(new THREE.SphereGeometry(10,32,32),shellB));
 
+  let starTarget=1,cloudTarget=0;
   function applySceneTheme(theme){
     const isLight=theme==='light';
     scene.fog.color.setHex(isLight?0xffefbf:0x04060f);
@@ -354,6 +355,11 @@ window.aiState='idle';
     shellA.opacity=isLight ? .06 : .025;
     shellB.color.setHex(isLight?0xffe07a:0xb9ff66);
     shellB.opacity=isLight ? .032 : .012;
+    ptB.color.setHex(isLight?0xffb85c:0x4facfe);
+    ptL.color.setHex(isLight?0xffe39a:0xb9ff66);
+    ptP.color.setHex(isLight?0xffcc6e:0xa78bfa);
+    starTarget=isLight?0:1;
+    cloudTarget=isLight?1:0;
   }
   applySceneTheme(root.getAttribute('data-theme')==='light'?'light':'dark');
   window.addEventListener('healthq-theme-change',e=>applySceneTheme(e.detail.theme));
@@ -371,8 +377,32 @@ window.aiState='idle';
     const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(pos,3));
     return new THREE.Points(g,new THREE.PointsMaterial({color:col,size:sz,transparent:true,opacity:op,sizeAttenuation:true}));
   }
-  const p1=mkP(700,12,30,0x4facfe,.065,.4),p2=mkP(350,8,45,0xa78bfa,.045,.22),p3=mkP(200,5,12,0xb9ff66,.05,.18);
-  scene.add(p1);scene.add(p2);scene.add(p3);
+  const starA=mkP(780,12,34,0xf4f8ff,.07,.52),starB=mkP(420,10,48,0x9fb9ff,.05,.3),starC=mkP(240,8,18,0xd8e4ff,.05,.16);
+  scene.add(starA);scene.add(starB);scene.add(starC);
+
+  const cloudGroup=new THREE.Group();
+  const cloudMats=[];
+  for(let i=0;i<9;i++){
+    const cluster=new THREE.Group();
+    const puffCount=4+Math.floor(Math.random()*4);
+    for(let j=0;j<puffCount;j++){
+      const mat=new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0,depthWrite:false});
+      mat.userData.baseOpacity=.08+Math.random()*.12;
+      const puff=new THREE.Mesh(new THREE.SphereGeometry(1,18,18),mat);
+      puff.position.set((Math.random()-.5)*2.8,(Math.random()-.5)*.9,(Math.random()-.5)*1.4);
+      puff.scale.set(2.0+Math.random()*1.9,.85+Math.random()*.55,1.1+Math.random()*1.2);
+      cluster.add(puff);
+      cloudMats.push(mat);
+    }
+    const ax=(Math.random()-.5)*44;
+    const ay=2+Math.random()*16;
+    const az=-26+Math.random()*14;
+    cluster.position.set(ax,ay,az);
+    cluster.userData={ax,ay,az,phase:Math.random()*Math.PI*2,speed:.13+Math.random()*.15};
+    cloudGroup.add(cluster);
+  }
+  scene.add(cloudGroup);
+  let starMix=starTarget,cloudMix=cloudTarget;
 
   let mx=0,my=0,tmx=0,tmy=0;
   document.addEventListener('mousemove',e=>{tmx=(e.clientX/innerWidth-.5)*2;tmy=(e.clientY/innerHeight-.5)*2});
@@ -404,8 +434,21 @@ window.aiState='idle';
     ptB.position.x=Math.cos(t*.7)*14; ptB.position.z=Math.sin(t*.5)*10;
     ptL.position.x=Math.cos(t*.6+Math.PI)*12; ptL.position.y=Math.sin(t*.45)*8;
     ptB.intensity=4+curAmp*4; ptL.intensity=3+curAmp*3;
-    p1.rotation.y=t*.022; p1.rotation.x=t*.007;
-    p2.rotation.y=-t*.015; p2.rotation.z=t*.01;
+    starMix+=(starTarget-starMix)*.03;
+    cloudMix+=(cloudTarget-cloudMix)*.03;
+    starA.material.opacity=.52*starMix;
+    starB.material.opacity=.3*starMix;
+    starC.material.opacity=.16*starMix;
+    cloudMats.forEach(m=>{m.opacity=m.userData.baseOpacity*cloudMix;});
+    cloudGroup.children.forEach(c=>{
+      const u=c.userData;
+      c.position.x=u.ax+Math.sin(t*u.speed+u.phase)*2.6;
+      c.position.y=u.ay+Math.cos(t*u.speed*.7+u.phase)*.9;
+      c.rotation.z=Math.sin(t*u.speed*.55+u.phase)*.08;
+    });
+    starA.rotation.y=t*.02; starA.rotation.x=t*.006;
+    starB.rotation.y=-t*.014; starB.rotation.z=t*.009;
+    starC.rotation.x=t*.011;
     mx+=(tmx-mx)*.04; my+=(tmy-my)*.04;
     camera.position.x+=(mx*4.5-camera.position.x)*.03;
     camera.position.y+=(-my*3.5-camera.position.y)*.03;
