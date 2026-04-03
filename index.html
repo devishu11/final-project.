@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
 <title>HealthQ</title>
 <script>
 (()=>{try{
@@ -22,6 +22,7 @@
   --safe-right:env(safe-area-inset-right,0px);
   --safe-bottom:env(safe-area-inset-bottom,0px);
   --safe-left:env(safe-area-inset-left,0px);
+  --kb-offset:0px;
   --bg:#04060f;
   --lime:#b9ff66;
   --blue:#4facfe;
@@ -109,7 +110,17 @@ html[data-theme='light'] body{
 #centre{position:fixed;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;padding:calc(var(--safe-top) + 52px) 24px calc(var(--safe-bottom) + 156px);}
 
 /* Idle hint */
-#idle-hint{font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--muted-soft);transition:opacity .6s;animation:idleFloat 3s ease-in-out infinite;}
+#idle-hint{
+  font-size:clamp(18px,2.8vw,30px);
+  font-weight:800;
+  letter-spacing:.4px;
+  text-transform:none;
+  color:var(--muted-soft);
+  transition:opacity .6s;
+  animation:idleFloat 3s ease-in-out infinite;
+  text-align:center;
+  max-width:min(92vw,860px);
+}
 @keyframes idleFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 
 /* Orb answer */
@@ -144,6 +155,13 @@ html[data-theme='light'] body{
   padding-right:0;
   text-shadow:0 1px 10px rgba(0,0,0,.22);
 }
+.spoken-word{transition:color .12s, text-shadow .12s, transform .12s}
+.spoken-word.active{
+  color:var(--lime);
+  text-shadow:0 0 16px rgba(185,255,102,.55);
+  font-weight:800;
+  transform:translateY(-1px);
+}
 .answer-footer{
   width:100%;
   display:flex;
@@ -166,7 +184,7 @@ html[data-theme='light'] body{
 @keyframes sb{0%,100%{height:3px}50%{height:10px}}
 
 /* Input bar */
-#input-wrap{position:fixed;bottom:max(12px,calc(var(--safe-bottom) + 10px));left:50%;transform:translateX(-50%);z-index:10;width:min(760px,calc(100vw - 24px));}
+#input-wrap{position:fixed;bottom:calc(max(30px,calc(var(--safe-bottom) + 26px)) + var(--kb-offset));left:50%;transform:translateX(-50%);z-index:10;width:min(760px,calc(100vw - 24px));}
 .ig{position:relative;border-radius:20px;background:linear-gradient(135deg,rgba(185,255,102,.18),rgba(79,172,254,.1),rgba(167,139,250,.12));padding:1.5px;}
 .ig::before{content:'';position:absolute;inset:-3px;border-radius:23px;background:linear-gradient(135deg,rgba(185,255,102,.1),rgba(79,172,254,.08),rgba(167,139,250,.08));filter:blur(14px);z-index:-1;opacity:0;transition:opacity .4s;}
 .ig:focus-within::before{opacity:1}
@@ -190,13 +208,21 @@ html[data-theme='light'] body{
   position:fixed;
   left:50%;
   transform:translateX(-50%);
-  bottom:max(4px,calc(var(--safe-bottom) + 2px));
+  bottom:max(6px,calc(var(--safe-bottom) + 4px));
   z-index:11;
   font-size:11px;
   font-weight:600;
   letter-spacing:.8px;
   color:var(--muted);
   pointer-events:none;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  white-space:nowrap;
+  max-width:calc(100vw - 12px);
+  overflow:hidden;
+  text-overflow:ellipsis;
+  text-align:center;
 }
 
 html[data-theme='light'] #themeBtn{
@@ -215,6 +241,10 @@ html[data-theme='light']{
 html[data-theme='light'] #state-label.thinking{color:#1d68cc}
 html[data-theme='light'] #state-label.speaking{color:#3f7d1e}
 html[data-theme='light'] #answer-text{text-shadow:none}
+html[data-theme='light'] .spoken-word.active{
+  color:#cb7b00;
+  text-shadow:0 0 12px rgba(255,185,72,.5);
+}
 html[data-theme='light'] .src-tag{color:rgba(15,23,42,.55)}
 html[data-theme='light'] .answer-footer{border-top-color:rgba(15,23,42,.28)}
 html[data-theme='light'] #speakBtn{
@@ -269,12 +299,13 @@ html[data-theme='light'] #cursor{box-shadow:0 0 8px rgba(255,170,60,.75)}
   #wordmark{top:calc(var(--safe-top) + 12px);left:max(10px,calc(var(--safe-left) + 8px));font-size:16px;letter-spacing:2.2px}
   #state-label{top:calc(var(--safe-top) + 42px);right:max(10px,calc(var(--safe-right) + 8px));gap:5px;letter-spacing:1.2px}
   #state-label .wv{display:none}
+  #idle-hint{font-size:clamp(15px,4.8vw,20px);line-height:1.25}
   #centre{padding:calc(var(--safe-top) + 76px) 14px calc(var(--safe-bottom) + 136px)}
   #orb-answer{width:clamp(220px,72vw,322px);height:clamp(220px,72vw,322px);padding:52px 20px 18px}
   #answer-text{font-size:14px}
   .answer-footer{margin-top:4px;padding-top:8px}
   .src-tag{font-size:9px;letter-spacing:.6px}
-  #input-wrap{width:calc(100vw - 14px);bottom:max(8px,calc(var(--safe-bottom) + 8px))}
+  #input-wrap{width:calc(100vw - 14px)}
   .ii{padding:6px 6px 6px 12px;gap:5px}
   #qi{font-size:14px;padding:10px 0;min-width:0}
   #voiceBtn,#askBtn,#langSelect{height:40px}
@@ -282,7 +313,7 @@ html[data-theme='light'] #cursor{box-shadow:0 0 8px rgba(255,170,60,.75)}
   #askBtn{padding:0 13px;font-size:12px}
   #langSelect{width:56px;padding:0 6px;font-size:11px}
   #hint{font-size:10px}
-  #page-footer{font-size:9px;letter-spacing:.4px}
+  #page-footer{font-size:9px;letter-spacing:.35px;max-width:calc(100vw - 8px)}
 }
 
 @media (max-width:390px){
@@ -295,11 +326,15 @@ html[data-theme='light'] #cursor{box-shadow:0 0 8px rgba(255,170,60,.75)}
 
 @media (max-height:560px) and (orientation:landscape){
   #centre{justify-content:flex-start;padding:calc(var(--safe-top) + 54px) 16px calc(var(--safe-bottom) + 108px)}
-  #idle-hint{font-size:11px;letter-spacing:1px}
+  #idle-hint{font-size:14px;letter-spacing:.4px}
   #orb-answer{width:clamp(182px,42vh,248px);height:clamp(182px,42vh,248px);padding:30px 16px 12px}
   #answer-text{font-size:13px}
-  #input-wrap{bottom:max(6px,calc(var(--safe-bottom) + 4px))}
-  #page-footer{display:none}
+  #input-wrap{bottom:calc(max(24px,calc(var(--safe-bottom) + 18px)) + var(--kb-offset))}
+  #page-footer{font-size:8px;opacity:.86}
+}
+
+@media (max-width:320px){
+  #page-footer{font-size:8px;letter-spacing:.2px}
 }
 
 @media (min-width:1600px){
@@ -534,6 +569,24 @@ window.aiState='idle';
 <script>
 const THEME_KEY='healthq-theme';
 const themeBtn=document.getElementById('themeBtn');
+const rootStyle=document.documentElement;
+
+function updateKeyboardOffset(){
+  if(!window.visualViewport){
+    rootStyle.style.setProperty('--kb-offset','0px');
+    return;
+  }
+  const vv=window.visualViewport;
+  const overlap=Math.max(0,window.innerHeight-(vv.height+vv.offsetTop));
+  rootStyle.style.setProperty('--kb-offset',Math.round(overlap)+'px');
+}
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize',updateKeyboardOffset);
+  window.visualViewport.addEventListener('scroll',updateKeyboardOffset);
+}
+window.addEventListener('resize',updateKeyboardOffset);
+updateKeyboardOffset();
+
 function applyTheme(theme){
   document.documentElement.setAttribute('data-theme',theme);
   try{localStorage.setItem(THEME_KEY,theme);}catch(_){}
@@ -604,6 +657,61 @@ function formatSingleLineAnswer(text){
   return clean.length>140 ? clean.slice(0,137).trimEnd()+'...' : clean;
 }
 
+const answerEl=document.getElementById('answer-text');
+let speechWords=[], speechWordSpans=[], activeSpeechWord=-1;
+
+function buildSpeechWords(text){
+  const words=[];
+  const re=/\S+/g;
+  let m;
+  while((m=re.exec(text||''))!==null){
+    words.push({word:m[0],start:m.index,end:m.index+m[0].length});
+  }
+  return words;
+}
+
+function renderSpeechWords(words){
+  answerEl.textContent='';
+  speechWordSpans.length=0;
+  const frag=document.createDocumentFragment();
+  for(let i=0;i<words.length;i++){
+    const span=document.createElement('span');
+    span.className='spoken-word';
+    span.textContent=words[i].word;
+    speechWordSpans.push(span);
+    frag.appendChild(span);
+    if(i<words.length-1) frag.appendChild(document.createTextNode(' '));
+  }
+  answerEl.appendChild(frag);
+}
+
+function beginSpeechSync(text){
+  speechWords=buildSpeechWords(text);
+  activeSpeechWord=-1;
+  if(speechWords.length) renderSpeechWords(speechWords);
+}
+
+function updateSpeechSync(charIndex){
+  if(!speechWords.length||!speechWordSpans.length) return;
+  let idx=-1;
+  for(let i=0;i<speechWords.length;i++){
+    const w=speechWords[i];
+    if(charIndex>=w.start&&charIndex<w.end){idx=i;break;}
+  }
+  if(idx===-1&&charIndex>=speechWords[speechWords.length-1].end) idx=speechWords.length-1;
+  if(idx===-1||idx===activeSpeechWord) return;
+  if(activeSpeechWord>=0&&speechWordSpans[activeSpeechWord]) speechWordSpans[activeSpeechWord].classList.remove('active');
+  if(speechWordSpans[idx]) speechWordSpans[idx].classList.add('active');
+  activeSpeechWord=idx;
+}
+
+function endSpeechSync(){
+  speechWords=[];
+  speechWordSpans.length=0;
+  activeSpeechWord=-1;
+  answerEl.textContent=lastAnswer||'';
+}
+
 userName=getUserName();
 updateBranding();
 updateIdleHint();
@@ -651,13 +759,14 @@ function doSpeak(text){
   const u=new SpeechSynthesisUtterance(text);
   u.lang=currentLang==='hi'?'hi-IN':'en-IN';
   u.rate=.92;u.pitch=1;
-  u.onstart=()=>{speakBtn.classList.add('on');setAIState('speaking')};
-  u.onend=()=>{speakBtn.classList.remove('on');setAIState('idle')};
-  u.onerror=()=>{speakBtn.classList.remove('on');setAIState('idle')};
+  u.onstart=()=>{beginSpeechSync(text);speakBtn.classList.add('on');setAIState('speaking')};
+  u.onboundary=e=>{if(typeof e.charIndex==='number') updateSpeechSync(e.charIndex);};
+  u.onend=()=>{endSpeechSync();speakBtn.classList.remove('on');setAIState('idle')};
+  u.onerror=()=>{endSpeechSync();speakBtn.classList.remove('on');setAIState('idle')};
   speechSynthesis.speak(u);
 }
 function toggleSpeak(){
-  if(speechSynthesis.speaking){speechSynthesis.cancel();speakBtn.classList.remove('on');setAIState('idle');}
+  if(speechSynthesis.speaking){speechSynthesis.cancel();endSpeechSync();speakBtn.classList.remove('on');setAIState('idle');}
   else if(lastAnswer){doSpeak(lastAnswer);}
 }
 
