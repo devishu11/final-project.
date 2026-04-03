@@ -124,17 +124,16 @@ html[data-theme='light'] body{
   flex:1;
   font-size:16px;
   font-weight:500;
-  line-height:1.7;
+  line-height:1.45;
   color:var(--orb-text);
   text-align:center;
-  overflow-y:auto;
-  max-height:100%;
-  padding-right:4px;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+  max-height:none;
+  padding-right:0;
   text-shadow:0 1px 10px rgba(0,0,0,.22);
 }
-#answer-text::-webkit-scrollbar{width:3px}
-#answer-text::-webkit-scrollbar-track{background:transparent}
-#answer-text::-webkit-scrollbar-thumb{background:rgba(185,255,102,.3);border-radius:3px}
 .answer-footer{
   width:100%;
   display:flex;
@@ -515,7 +514,52 @@ if(!isTouch){
 }
 
 const API='';
-let currentLang='en', lastAnswer='';
+const ASSISTANT_NAME='SkyCare';
+const USER_NAME_KEY='healthq-user-name';
+let currentLang='en', lastAnswer='', userName='Friend';
+
+function cleanName(raw){
+  const value=(raw||'').replace(/[^a-zA-Z\s]/g,'').trim().replace(/\s+/g,' ');
+  return value.slice(0,22);
+}
+
+function getUserName(){
+  let saved='';
+  try{saved=localStorage.getItem(USER_NAME_KEY)||'';}catch(_){}
+  saved=cleanName(saved);
+  if(saved) return saved;
+  const entered=cleanName(window.prompt('Welcome! What is your name?','')||'');
+  const finalName=entered||'Friend';
+  try{localStorage.setItem(USER_NAME_KEY,finalName);}catch(_){}
+  return finalName;
+}
+
+function updateBranding(){
+  const mark=document.getElementById('wordmark');
+  const tag=document.getElementById('src-tag');
+  const footer=document.getElementById('page-footer');
+  if(mark) mark.textContent=ASSISTANT_NAME.toUpperCase();
+  if(tag) tag.textContent=ASSISTANT_NAME+' - AI';
+  if(footer) footer.textContent=ASSISTANT_NAME+' - Your Health Companion';
+}
+
+function updateIdleHint(){
+  const hint=document.getElementById('idle-hint');
+  if(!hint) return;
+  hint.textContent=currentLang==='hi'
+    ? 'Welcome '+userName+'! Aap apne health ke baare mein puch sakte hain.'
+    : 'Welcome '+userName+'! Ask '+ASSISTANT_NAME+' anything about your health.';
+}
+
+function formatSingleLineAnswer(text){
+  const clean=(text||'').replace(/\s+/g,' ').trim();
+  if(!clean) return 'I am here to help with your health questions.';
+  return clean.length>140 ? clean.slice(0,137).trimEnd()+'...' : clean;
+}
+
+userName=getUserName();
+updateBranding();
+updateIdleHint();
 
 function setAIState(s){
   window.aiState=s;
@@ -525,21 +569,33 @@ function setAIState(s){
 }
 
 function showAnswer(text,source){
-  lastAnswer=text;
+  const oneLineAnswer=formatSingleLineAnswer(text);
+  lastAnswer=oneLineAnswer;
   const card=document.getElementById('orb-answer');
   const el=document.getElementById('answer-text');
+  document.getElementById('src-tag').textContent=source==='ai'
+    ? ASSISTANT_NAME+' - Groq AI'
+    : source==='wikipedia'
+      ? ASSISTANT_NAME+' - Wikipedia'
+      : ASSISTANT_NAME+' - Health Data';
   document.getElementById('src-tag').textContent=source==='ai'?'Groq AI · LLaMA 3 70B':source==='wikipedia'?'Wikipedia · Health Article':'HealthQ · Database';
+  document.getElementById('src-tag').textContent=source==='ai'
+    ? ASSISTANT_NAME+' - Groq AI'
+    : source==='wikipedia'
+      ? ASSISTANT_NAME+' - Wikipedia'
+      : ASSISTANT_NAME+' - Health Data';
   document.getElementById('idle-hint').style.opacity='0';
   card.classList.remove('visible');
   el.textContent='';
   void card.offsetWidth; // reflow
   card.classList.add('visible');
-  typewriterInto(el,text,()=>setTimeout(()=>doSpeak(text),200));
+  typewriterInto(el,oneLineAnswer,()=>setTimeout(()=>doSpeak(oneLineAnswer),200));
 }
 
 function hideAnswer(){
   document.getElementById('orb-answer').classList.remove('visible');
   document.getElementById('idle-hint').style.opacity='1';
+  updateIdleHint();
 }
 
 function typewriterInto(el,text,onDone){
@@ -579,6 +635,7 @@ function onLangChange(){
     document.getElementById('askBtn').textContent='Ask';
     document.getElementById('idle-hint').textContent='Ask me anything about your health';
   }
+  updateIdleHint();
 }
 document.getElementById('qi').addEventListener('keydown',e=>{if(e.key==='Enter')ask()});
 
