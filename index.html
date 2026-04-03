@@ -281,7 +281,7 @@ html[data-theme='light'] #cursor{box-shadow:0 0 8px rgba(255,170,60,.75)}
   <div id="orb-answer">
     <div id="answer-text"></div>
     <div class="answer-footer">
-      <span class="src-tag" id="src-tag">HealthQ · AI</span>
+      <span class="src-tag" id="src-tag">Model: LLaMA 3.1 8B</span>
       <button id="speakBtn" onclick="toggleSpeak()">
         <div class="speak-bars"><b></b><b></b><b></b></div>
         Read aloud
@@ -290,7 +290,7 @@ html[data-theme='light'] #cursor{box-shadow:0 0 8px rgba(255,170,60,.75)}
   </div>
 </div>
 
-<div id="page-footer">HealthQ - College Project Frontend</div>
+<div id="page-footer">Powered by LLaMA 3.1 8B</div>
 
 <div id="input-wrap">
   <div class="ig">
@@ -514,7 +514,7 @@ if(!isTouch){
 }
 
 const API='';
-const ASSISTANT_NAME='SkyCare';
+const MODEL_NAME='LLaMA 3.1 8B';
 const USER_NAME_KEY='healthq-user-name';
 let currentLang='en', lastAnswer='', userName='Friend';
 
@@ -538,9 +538,9 @@ function updateBranding(){
   const mark=document.getElementById('wordmark');
   const tag=document.getElementById('src-tag');
   const footer=document.getElementById('page-footer');
-  if(mark) mark.textContent=ASSISTANT_NAME.toUpperCase();
-  if(tag) tag.textContent=ASSISTANT_NAME+' - AI';
-  if(footer) footer.textContent=ASSISTANT_NAME+' - Your Health Companion';
+  if(mark) mark.textContent='HEALTHQ';
+  if(tag) tag.textContent='Model: '+MODEL_NAME;
+  if(footer) footer.textContent='Powered by '+MODEL_NAME;
 }
 
 function updateIdleHint(){
@@ -548,7 +548,7 @@ function updateIdleHint(){
   if(!hint) return;
   hint.textContent=currentLang==='hi'
     ? 'Welcome '+userName+'! Aap apne health ke baare mein puch sakte hain.'
-    : 'Welcome '+userName+'! Ask '+ASSISTANT_NAME+' anything about your health.';
+    : 'Welcome '+userName+'! Ask '+MODEL_NAME+' about your health.';
 }
 
 function formatSingleLineAnswer(text){
@@ -574,16 +574,10 @@ function showAnswer(text,source){
   const card=document.getElementById('orb-answer');
   const el=document.getElementById('answer-text');
   document.getElementById('src-tag').textContent=source==='ai'
-    ? ASSISTANT_NAME+' - Groq AI'
+    ? 'Model: '+MODEL_NAME+' (Groq)'
     : source==='wikipedia'
-      ? ASSISTANT_NAME+' - Wikipedia'
-      : ASSISTANT_NAME+' - Health Data';
-  document.getElementById('src-tag').textContent=source==='ai'?'Groq AI · LLaMA 3 70B':source==='wikipedia'?'Wikipedia · Health Article':'HealthQ · Database';
-  document.getElementById('src-tag').textContent=source==='ai'
-    ? ASSISTANT_NAME+' - Groq AI'
-    : source==='wikipedia'
-      ? ASSISTANT_NAME+' - Wikipedia'
-      : ASSISTANT_NAME+' - Health Data';
+      ? 'Wikipedia + '+MODEL_NAME
+      : 'HealthQ - Local Data';
   document.getElementById('idle-hint').style.opacity='0';
   card.classList.remove('visible');
   el.textContent='';
