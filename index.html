@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-<title>HealthQ</title>
+<title>Health-Tech</title>
 <script>
 (()=>{try{
   const key='healthq-theme';
@@ -357,7 +357,7 @@ html[data-theme='light'] #cursor{box-shadow:0 0 8px rgba(255,170,60,.75)}
 <div id="cursor-ring"></div>
 <canvas id="bg"></canvas>
 
-<div id="wordmark">HEALTHQ</div>
+<div id="wordmark">HEALTH-TECH</div>
 <button id="themeBtn" type="button">Light mode</button>
 
 <div id="state-label">
@@ -380,7 +380,7 @@ html[data-theme='light'] #cursor{box-shadow:0 0 8px rgba(255,170,60,.75)}
   </div>
 </div>
 
-<div id="page-footer">Powered by Elevate</div>
+<div id="page-footer">Powered by Team : Elevate</div>
 
 <div id="input-wrap">
   <div class="ig">
@@ -477,7 +477,7 @@ window.aiState='idle';
     cloudTarget=isLight?1:0;
   }
   applySceneTheme(root.getAttribute('data-theme')==='light'?'light':'dark');
-  window.addEventListener('healthq-theme-change',e=>applySceneTheme(e.detail.theme));
+  window.addEventListener('health-tech-theme-change',e=>applySceneTheme(e.detail.theme));
 
   const NRINGS=10,wR=[];
   for(let i=0;i<NRINGS;i++){
@@ -599,7 +599,7 @@ function applyTheme(theme){
   document.documentElement.setAttribute('data-theme',theme);
   try{localStorage.setItem(THEME_KEY,theme);}catch(_){}
   if(themeBtn) themeBtn.textContent=theme==='light'?'Dark mode':'Light mode';
-  window.dispatchEvent(new CustomEvent('healthq-theme-change',{detail:{theme}}));
+  window.dispatchEvent(new CustomEvent('health-tech-theme-change',{detail:{theme}}));
 }
 applyTheme(document.documentElement.getAttribute('data-theme')||'dark');
 if(themeBtn){
@@ -623,7 +623,7 @@ if(!isTouch){
 
 const API='';
 const MODEL_NAME='Elevate';
-const USER_NAME_KEY='healthq-user-name';
+const USER_NAME_KEY='health-tech-user-name';
 let currentLang='en', lastAnswer='', userName='Friend';
 
 function cleanName(raw){
@@ -646,7 +646,7 @@ function updateBranding(){
   const mark=document.getElementById('wordmark');
   const tag=document.getElementById('src-tag');
   const footer=document.getElementById('page-footer');
-  if(mark) mark.textContent='HEALTHQ';
+  if(mark) mark.textContent='HEALTH-TECH';
   if(tag) tag.textContent='Model: '+MODEL_NAME;
   if(footer) footer.textContent='Powered by '+MODEL_NAME;
 }
