@@ -1,157 +1,65 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Health-tech : ARIA</title>
+<title>HealthQ</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Urbanist:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-
-/* ── Themes ── */
-[data-theme="dark"]{
+:root{
+  color-scheme:light dark;
   --bg:#04060f;
   --lime:#b9ff66;
   --blue:#4facfe;
   --purple:#a78bfa;
   --white:#f5f9ff;
-  --card-bg:rgba(4,8,22,0.75);
-  --muted:#6b7a99;
-  --glass:rgba(255,255,255,0.05);
-  --glass-b:rgba(255,255,255,0.10);
+  --card-bg:rgba(4,8,22,0.72);
+  --muted:rgba(255,255,255,.22);
+  --muted-soft:rgba(255,255,255,.18);
+  --hint:rgba(255,255,255,.14);
   --input-bg:rgba(4,8,22,.92);
-  --footer-border:rgba(255,255,255,0.07);
-  --footer-text:rgba(255,255,255,0.22);
-  --placeholder:rgba(255,255,255,0.22);
-  --hint-color:rgba(255,255,255,0.16);
-  --wordmark-color:rgba(255,255,255,0.22);
-  --state-color:rgba(255,255,255,0.25);
-  --state-dot-bg:rgba(255,255,255,0.2);
-  --idle-hint-color:rgba(255,255,255,0.18);
-  --card-border:rgba(185,255,102,0.12);
-  --card-text:rgba(255,255,255,0.90);
-  --footer-text2:rgba(255,255,255,0.18);
-  --src-tag-color:rgba(255,255,255,0.22);
-  --speak-btn-color:rgba(255,255,255,0.32);
-  --speak-btn-border:rgba(255,255,255,0.09);
-  --input-border-grad:rgba(185,255,102,0.18),rgba(79,172,254,0.10),rgba(167,139,250,0.12);
-  --scrollbar-thumb:rgba(185,255,102,0.20);
-  --orb-name-color:rgba(185,255,102,0.55);
-  --orb-tagline-color:rgba(255,255,255,0.18);
-  --voice-btn-bg:rgba(255,255,255,0.04);
-  --voice-btn-border:rgba(255,255,255,0.09);
-  --voice-btn-color:rgba(255,255,255,0.36);
+  --input-option-bg:#04060f;
+  --orb-text:rgba(255,255,255,.9);
 }
-[data-theme="light"]{
-  --bg:#eef2fb;
-  --lime:#1d4ed8;
-  --blue:#0284c7;
-  --purple:#6d28d9;
-  --white:#0f172a;
-  --card-bg:rgba(255,255,255,0.97);
-  --muted:#475569;
-  --glass:rgba(255,255,255,0.70);
-  --glass-b:rgba(0,0,0,0.09);
-  --input-bg:rgba(255,255,255,0.97);
-  --footer-border:rgba(0,0,0,0.08);
-  --footer-text:rgba(0,0,0,0.35);
-  --placeholder:rgba(0,0,0,0.28);
-  --hint-color:rgba(0,0,0,0.30);
-  --wordmark-color:rgba(0,0,0,0.30);
-  --state-color:rgba(0,0,0,0.35);
-  --state-dot-bg:rgba(0,0,0,0.20);
-  --idle-hint-color:rgba(0,0,0,0.35);
-  --card-border:rgba(29,78,216,0.15);
-  --card-text:#1e293b;
-  --footer-text2:rgba(0,0,0,0.30);
-  --src-tag-color:rgba(0,0,0,0.35);
-  --speak-btn-color:rgba(0,0,0,0.40);
-  --speak-btn-border:rgba(0,0,0,0.12);
-  --input-border-grad:rgba(29,78,216,0.25),rgba(2,132,199,0.15),rgba(109,40,217,0.15);
-  --scrollbar-thumb:rgba(29,78,216,0.20);
-  --orb-name-color:rgba(29,78,216,0.65);
-  --orb-tagline-color:rgba(0,0,0,0.35);
-  --voice-btn-bg:rgba(0,0,0,0.04);
-  --voice-btn-border:rgba(0,0,0,0.10);
-  --voice-btn-color:rgba(0,0,0,0.40);
-}
-
 html,body{height:100%;overflow:hidden}
 body{
   background:var(--bg);color:var(--white);
   font-family:'Urbanist',sans-serif;
   cursor:none;
-  transition:background 0.4s,color 0.3s;
 }
 
-/* ══════════════════════════════
-   CUSTOM CURSOR — fixed properly
-══════════════════════════════ */
-#cursor{
-  position:fixed;width:7px;height:7px;border-radius:50%;
-  background:var(--lime);pointer-events:none;z-index:99999;
-  transform:translate(-50%,-50%);
-  box-shadow:0 0 10px var(--lime);
-  transition:width .2s,height .2s;
-  will-change:left,top;
+@media (prefers-color-scheme:light){
+  :root{
+    --bg:#edf4ff;
+    --white:#0f172a;
+    --card-bg:rgba(255,255,255,.62);
+    --muted:rgba(15,23,42,.5);
+    --muted-soft:rgba(15,23,42,.35);
+    --hint:rgba(15,23,42,.55);
+    --input-bg:rgba(255,255,255,.85);
+    --input-option-bg:#f8fbff;
+    --orb-text:rgba(15,23,42,.9);
+  }
 }
+
+/* Cursor */
+#cursor{position:fixed;width:7px;height:7px;border-radius:50%;background:var(--lime);pointer-events:none;z-index:10000;transform:translate(-50%,-50%);box-shadow:0 0 8px rgba(185,255,102,.9);transition:width .2s,height .2s}
 #cursor.hover{width:11px;height:11px}
-#cursor-ring{
-  position:fixed;width:34px;height:34px;border-radius:50%;
-  border:1.5px solid color-mix(in srgb, var(--lime) 45%, transparent);
-  pointer-events:none;z-index:99998;
-  transform:translate(-50%,-50%);
-  box-shadow:0 0 12px rgba(185,255,102,.12);
-  transition:width .35s cubic-bezier(.16,1,.3,1),height .35s,border-color .35s;
-  will-change:left,top;
-}
+#cursor-ring{position:fixed;width:34px;height:34px;border-radius:50%;border:1.5px solid rgba(185,255,102,.45);pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .35s cubic-bezier(.16,1,.3,1),height .35s,border-color .35s}
 #cursor-ring.hover{width:50px;height:50px;border-color:rgba(185,255,102,.2)}
+@media(hover:none),(pointer:coarse){#cursor,#cursor-ring{display:none!important}body{cursor:auto!important}}
 
-
-@media(hover:none),(pointer:coarse){
-  #cursor,#cursor-ring{display:none!important}
-  body{cursor:auto!important}
-}
-
-/* ── 3D canvas ── */
+/* 3D canvas */
 #bg{position:fixed;inset:0;z-index:0;pointer-events:none}
 
-/* ── Wordmark top-left ── */
-#wordmark{
-  position:fixed;top:28px;left:32px;z-index:10;
-  font-family:'Bebas Neue',sans-serif;font-size:20px;
-  letter-spacing:3.5px;color:rgba(255,255,255,.22);
-  pointer-events:none;
-}
-[data-theme="light"] #wordmark{color:rgba(0,0,0,0.22);}
+/* Wordmark */
+#wordmark{position:fixed;top:28px;left:32px;z-index:10;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3.5px;color:var(--muted);pointer-events:none;}
 
-/* ── Theme button top-center ── */
-#themeBtn{
-  position:fixed;top:22px;left:50%;transform:translateX(-50%);
-  z-index:20;
-  background:var(--glass);border:1px solid var(--glass-b);
-  border-radius:100px;padding:6px 18px;
-  font-size:11px;font-weight:600;letter-spacing:1.2px;
-  color:var(--state-color);
-  cursor:pointer;
-  font-family:'Urbanist',sans-serif;
-  transition:all 0.25s;
-  backdrop-filter:blur(12px);
-  display:flex;align-items:center;gap:7px;
-  white-space:nowrap;
-}
-#themeBtn:hover{background:var(--glass-b);color:var(--white);}
-
-/* ── State label top-right ── */
-#state-label{
-  position:fixed;top:28px;right:32px;z-index:10;
-  display:flex;align-items:center;gap:7px;
-  font-size:11px;letter-spacing:1.8px;text-transform:uppercase;
-  color:var(--state-color);transition:color .5s;
-  pointer-events:none;
-}
-#state-dot{width:7px;height:7px;border-radius:50%;background:var(--state-dot-bg);transition:background .5s,box-shadow .5s;}
+/* State label */
+#state-label{position:fixed;top:28px;right:32px;z-index:10;display:flex;align-items:center;gap:7px;font-size:11px;letter-spacing:1.8px;text-transform:uppercase;color:var(--muted);transition:color .5s;pointer-events:none;}
+#state-dot{width:7px;height:7px;border-radius:50%;background:var(--muted-soft);transition:background .5s,box-shadow .5s;}
 #state-label.thinking{color:rgba(79,172,254,.7)}
 #state-label.thinking #state-dot{background:#4facfe;box-shadow:0 0 10px rgba(79,172,254,.9);animation:sPulse .7s ease infinite}
 #state-label.speaking{color:rgba(185,255,102,.8)}
@@ -168,88 +76,52 @@ body{
 #state-label.thinking .wv span:nth-child(even){height:4px}
 @keyframes wvB{0%,100%{height:3px}50%{height:11px}}
 
-/* ══════════════════════════════
-   CENTRE — orb + answer + hint
-   Answer lives INSIDE the orb
-   using a z-index overlay
-══════════════════════════════ */
-#centre{
-  position:fixed;inset:0;z-index:5;
-  display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  pointer-events:none;
-  /* push up slightly to leave room for input bar */
-  padding-bottom:130px;
-}
+/* Centre overlay */
+#centre{position:fixed;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;padding:0 32px 140px;}
 
-/* ── "Ask me" idle hint — perfectly centered ── */
-#idle-hint{
-  font-size:13px;letter-spacing:2px;text-transform:uppercase;
-  color:var(--idle-hint-color);
-  transition:opacity .6s;
-  animation:idleFloat 3s ease-in-out infinite;
-  text-align:center;
-  position:absolute; /* sit in the exact center of #centre */
-  top:50%;left:50%;
-  transform:translate(-50%,-50%);
-  white-space:nowrap;
-  padding-bottom:130px; /* match centre padding */
-}
-[data-theme="light"] #idle-hint{color:rgba(0,0,0,.22);}
-@keyframes idleFloat{0%,100%{transform:translate(-50%,-50%) translateY(0)}50%{transform:translate(-50%,-50%) translateY(-8px)}}
+/* Idle hint */
+#idle-hint{font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--muted-soft);transition:opacity .6s;animation:idleFloat 3s ease-in-out infinite;}
+@keyframes idleFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 
-/* ── Answer card — floats OVER the orb center ── */
-#answer-card{
-  position:absolute;
-  top:50%;left:50%;
-  transform:translate(-50%,-50%) scale(.96);
-  /* shift up a bit so it reads over the orb */
-  margin-top:-65px;
-
-  width:min(520px, calc(100vw - 48px));
-  background:var(--card-bg);
-  border:1px solid var(--card-border);
-  border-radius:24px;
-  padding:24px 28px 20px;
-  backdrop-filter:blur(40px);
-  -webkit-backdrop-filter:blur(40px);
-  box-shadow:
-    0 0 0 1px rgba(185,255,102,.03),
-    0 0 60px rgba(185,255,102,.05),
-    0 24px 64px rgba(0,0,0,.4);
+/* Orb answer */
+#orb-answer{
+  width:min(430px,70vw);
+  height:min(430px,70vw);
+  border-radius:50%;
+  border:1px solid rgba(185,255,102,.24);
+  background:
+    radial-gradient(circle at 30% 25%, rgba(185,255,102,.13), transparent 45%),
+    radial-gradient(circle at 70% 75%, rgba(79,172,254,.14), transparent 45%),
+    var(--card-bg);
+  backdrop-filter:blur(24px);
+  box-shadow:0 0 70px rgba(185,255,102,.1),0 30px 70px rgba(0,0,0,.35),inset 0 0 40px rgba(255,255,255,.05);
   opacity:0;
-  transition:opacity .5s cubic-bezier(.16,1,.3,1),transform .5s cubic-bezier(.16,1,.3,1);
-  pointer-events:none;
-  max-height:46vh;overflow-y:auto;
-  z-index:8;
-}
-[data-theme="light"] #answer-card{
-  box-shadow:0 4px 40px rgba(0,0,0,.10),0 0 0 1px rgba(29,78,216,.06);
-}
-#answer-card.visible{
-  opacity:1;
-  transform:translate(-50%,-50%) scale(1);
+  transform:scale(.9);
+  transition:opacity .55s cubic-bezier(.16,1,.3,1),transform .55s cubic-bezier(.16,1,.3,1);
   pointer-events:auto;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  padding:64px 46px 34px;
 }
-#answer-card::-webkit-scrollbar{width:3px}
-#answer-card::-webkit-scrollbar-track{background:transparent}
-#answer-card::-webkit-scrollbar-thumb{background:var(--scrollbar-thumb);border-radius:3px}
-#answer-text{font-size:15px;font-weight:400;line-height:1.8;color:var(--card-text);}
-.answer-footer{
-  display:flex;align-items:center;justify-content:space-between;
-  margin-top:14px;padding-top:12px;
-  border-top:1px solid var(--glass-b);
+#orb-answer.visible{opacity:1;transform:scale(1)}
+#answer-text{
+  font-size:15px;
+  font-weight:500;
+  line-height:1.7;
+  color:var(--orb-text);
+  text-align:center;
+  overflow-y:auto;
+  max-height:58%;
+  padding-right:4px;
 }
-.src-tag{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--src-tag-color);}
-#speakBtn{
-  display:flex;align-items:center;gap:6px;
-  background:none;border:1px solid var(--speak-btn-border);
-  border-radius:8px;padding:5px 12px;
-  font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;
-  color:var(--speak-btn-color);cursor:pointer;
-  font-family:'Urbanist',sans-serif;transition:all .2s;
-}
-#speakBtn:hover{color:var(--white);border-color:var(--glass-b)}
+#answer-text::-webkit-scrollbar{width:3px}
+#answer-text::-webkit-scrollbar-track{background:transparent}
+#answer-text::-webkit-scrollbar-thumb{background:rgba(185,255,102,.3);border-radius:3px}
+.answer-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.12);}
+.src-tag{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);}
+#speakBtn{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.14);border-radius:999px;padding:6px 13px;font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:rgba(255,255,255,.72);cursor:none;font-family:'Urbanist',sans-serif;transition:all .2s;}
+#speakBtn:hover{color:var(--white);border-color:rgba(255,255,255,.28)}
 #speakBtn.on{color:var(--lime);border-color:rgba(185,255,102,.3);background:rgba(185,255,102,.05)}
 .speak-bars{display:flex;align-items:center;gap:1.5px;height:10px}
 .speak-bars b{display:block;width:2px;background:currentColor;border-radius:2px;height:3px}
@@ -258,121 +130,77 @@ body{
 #speakBtn.on .speak-bars b:nth-child(3){animation:sb .65s ease infinite .3s}
 @keyframes sb{0%,100%{height:3px}50%{height:10px}}
 
-/* ── ARIA name below orb ── */
-#orb-name{
-  position:absolute;
-  top:50%;left:50%;
-  /* push below the orb — orb radius is ~4.2 units, camera z=24, so ~screen 180px radius */
-  transform:translate(-50%, calc(-50% + 210px));
-  text-align:center;pointer-events:none;
-  margin-bottom:130px; /* mirror centre padding */
-}
-#orb-name .oname{
-  font-family:'Bebas Neue',sans-serif;font-size:20px;
-  letter-spacing:6px;
-  color:var(--orb-name-color);
-  text-shadow:0 0 24px var(--orb-name-color);
-}
-#orb-name .otagline{
-  font-size:10px;letter-spacing:2.5px;text-transform:uppercase;
-  color:var(--orb-tagline-color);margin-top:4px;
-}
-
-/* ══════════════════════════════
-   INPUT BAR
-══════════════════════════════ */
-#input-wrap{
-  position:fixed;bottom:52px;left:50%;
-  transform:translateX(-50%);
-  z-index:10;
-  width:min(640px,calc(100vw - 40px));
-}
-.ig{position:relative;border-radius:20px;background:linear-gradient(135deg,var(--input-border-grad));padding:1.5px;}
+/* Input bar */
+#input-wrap{position:fixed;bottom:36px;left:50%;transform:translateX(-50%);z-index:10;width:min(640px,calc(100vw - 48px));}
+.ig{position:relative;border-radius:20px;background:linear-gradient(135deg,rgba(185,255,102,.18),rgba(79,172,254,.1),rgba(167,139,250,.12));padding:1.5px;}
 .ig::before{content:'';position:absolute;inset:-3px;border-radius:23px;background:linear-gradient(135deg,rgba(185,255,102,.1),rgba(79,172,254,.08),rgba(167,139,250,.08));filter:blur(14px);z-index:-1;opacity:0;transition:opacity .4s;}
 .ig:focus-within::before{opacity:1}
 .ii{display:flex;align-items:center;gap:8px;background:var(--input-bg);border-radius:19px;padding:8px 8px 8px 22px;backdrop-filter:blur(24px);}
 #qi{flex:1;background:none;border:none;outline:none;color:var(--white);font-family:'Urbanist',sans-serif;font-size:16px;font-weight:400;padding:13px 0;caret-color:var(--lime);}
-#qi::placeholder{color:var(--placeholder)}
-#voiceBtn{width:48px;height:48px;border-radius:14px;background:var(--voice-btn-bg);border:1px solid var(--voice-btn-border);color:var(--voice-btn-color);font-size:16px;cursor:none;display:flex;align-items:center;justify-content:center;transition:all .25s;flex-shrink:0;}
-#voiceBtn:hover{background:var(--glass-b);color:var(--white);border-color:var(--glass-b)}
+#qi::placeholder{color:rgba(255,255,255,.2)}
+#voiceBtn{width:48px;height:48px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.35);font-size:16px;cursor:none;display:flex;align-items:center;justify-content:center;transition:all .25s;flex-shrink:0;}
+#voiceBtn:hover{background:rgba(255,255,255,.09);color:var(--white);border-color:rgba(255,255,255,.18)}
 #voiceBtn.listening{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.4);color:#f87171;animation:mRing 1.2s ease infinite}
 @keyframes mRing{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.3)}60%{box-shadow:0 0 0 10px rgba(239,68,68,0)}}
 #askBtn{background:var(--lime);color:#04060f;border:none;border-radius:14px;padding:13px 26px;font-family:'Urbanist',sans-serif;font-size:14px;font-weight:700;cursor:none;flex-shrink:0;letter-spacing:.5px;transition:all .25s;box-shadow:0 4px 24px rgba(185,255,102,.25);}
 #askBtn:hover{background:#c9ff77;box-shadow:0 8px 32px rgba(185,255,102,.4);transform:translateY(-1px)}
 #askBtn:active{transform:translateY(1px)}
 #askBtn:disabled{opacity:.35;cursor:none;transform:none}
-#langSelect{background:var(--voice-btn-bg);border:1px solid var(--voice-btn-border);border-radius:12px;color:var(--voice-btn-color);font-family:'Urbanist',sans-serif;font-size:13px;font-weight:600;padding:0 12px;height:48px;outline:none;cursor:none;flex-shrink:0;transition:all .25s;appearance:none;text-align:center;}
+#langSelect{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;color:rgba(255,255,255,.55);font-family:'Urbanist',sans-serif;font-size:13px;font-weight:600;padding:0 12px;height:48px;outline:none;cursor:none;flex-shrink:0;transition:all .25s;appearance:none;text-align:center;}
 #langSelect:hover{background:rgba(185,255,102,.08);border-color:rgba(185,255,102,.3);color:var(--lime)}
-#langSelect option{background:#04060f;color:#f5f9ff}
-#hint{text-align:center;font-size:11px;color:var(--hint-color);margin-top:10px;letter-spacing:.5px;transition:color .3s;}
+#langSelect option{background:var(--input-option-bg);color:var(--white)}
+#hint{text-align:center;font-size:11px;color:var(--hint);margin-top:10px;letter-spacing:.5px;transition:color .3s;}
 #hint.red{color:#f87171}
 
-/* ══════════════════════════════
-   FOOTER — full proper footer
-   like the original project
-══════════════════════════════ */
-.site-footer{
-  position:fixed;bottom:0;left:0;right:0;
-  z-index:9;
-  background:transparent;
-  border-top:1px solid var(--footer-border);
-  backdrop-filter:blur(16px);
-  -webkit-backdrop-filter:blur(16px);
-  display:flex;align-items:center;justify-content:space-between;
-  padding:8px 32px;
-  height:44px;
+@media (prefers-color-scheme:light){
+  #state-label.thinking{color:#1d68cc}
+  #state-label.speaking{color:#3f7d1e}
+  #orb-answer{
+    border-color:rgba(79,172,254,.36);
+    box-shadow:0 0 80px rgba(79,172,254,.22),0 24px 50px rgba(15,23,42,.12),inset 0 0 35px rgba(255,255,255,.35);
+  }
+  .answer-footer{border-top-color:rgba(15,23,42,.15)}
+  #speakBtn{
+    background:rgba(255,255,255,.55);
+    border-color:rgba(15,23,42,.22);
+    color:rgba(15,23,42,.78);
+  }
+  #speakBtn:hover{
+    color:#0f172a;
+    border-color:rgba(15,23,42,.32);
+  }
+  #voiceBtn{
+    background:rgba(15,23,42,.05);
+    border-color:rgba(15,23,42,.16);
+    color:rgba(15,23,42,.72);
+  }
+  #voiceBtn:hover{
+    background:rgba(15,23,42,.1);
+    border-color:rgba(15,23,42,.24);
+    color:#0f172a;
+  }
+  #qi::placeholder{color:rgba(15,23,42,.42)}
+  #langSelect{
+    background:rgba(15,23,42,.06);
+    border-color:rgba(15,23,42,.2);
+    color:rgba(15,23,42,.78);
+  }
 }
-.footer-copy{
-  font-size:11px;color:var(--footer-text);
-  letter-spacing:0.3px;
-}
-.footer-copy .lime{color:var(--orb-name-color);}
-.footer-links{display:flex;align-items:center;gap:16px;}
-.footer-links a{
-  font-size:11px;color:var(--footer-text);
-  text-decoration:none;letter-spacing:0.3px;
-  transition:color .2s;
-}
-.footer-links a:hover{color:var(--lime);}
 
-/* ══════════════════════════════
-   RESPONSIVE
-══════════════════════════════ */
-@media(max-width:768px){
-  #answer-card{width:calc(100vw - 40px);padding:20px 20px 16px;margin-top:-50px}
-  #orb-name{transform:translate(-50%,calc(-50% + 170px))}
-  .site-footer{padding:8px 20px}
-}
 @media(max-width:600px){
-  body{cursor:auto}
-  #cursor,#cursor-ring{display:none!important}
-  #askBtn,#voiceBtn,#langSelect,#speakBtn,#themeBtn{cursor:pointer}
-  #wordmark{top:18px;left:16px;font-size:17px;letter-spacing:2px}
-  #state-label{top:20px;right:16px;font-size:10px}
-  #themeBtn{top:18px;font-size:10px;padding:5px 12px;letter-spacing:0.8px}
+  body{cursor:auto}#cursor,#cursor-ring{display:none!important}
+  #askBtn,#voiceBtn,#langSelect,#speakBtn{cursor:pointer}
   .ii{padding:6px 6px 6px 16px;gap:6px}
   #qi{font-size:15px;padding:11px 0}
-  #voiceBtn{width:42px;height:42px;font-size:14px}
-  #askBtn{padding:11px 16px;font-size:13px}
-  #langSelect{height:42px;font-size:12px;padding:0 8px}
-  #input-wrap{bottom:50px;width:calc(100vw - 28px)}
-  #answer-card{width:calc(100vw - 28px);padding:16px 16px 14px;max-height:38vh;margin-top:-40px}
-  #answer-text{font-size:14px}
-  #orb-name{transform:translate(-50%,calc(-50% + 145px))}
-  #orb-name .oname{font-size:17px;letter-spacing:4px}
-  .site-footer{padding:6px 16px;height:40px}
-  .footer-copy{font-size:10px}
-  .footer-links a{font-size:10px}
-}
-@media(max-width:380px){
-  #answer-card{padding:14px 13px 12px;margin-top:-30px}
-  #answer-text{font-size:13px;line-height:1.7}
-  #askBtn{padding:10px 12px;font-size:12px}
-}
-@media(max-width:768px) and (orientation:landscape){
-  #answer-card{max-height:32vh;margin-top:-30px}
-  #orb-name{transform:translate(-50%,calc(-50% + 125px))}
-  #input-wrap{bottom:46px}
+  #voiceBtn,#askBtn{width:42px;height:42px;font-size:13px}
+  #askBtn{padding:11px 18px}
+  #langSelect{height:42px;font-size:12px}
+  #orb-answer{width:min(340px,80vw);height:min(340px,80vw);padding:44px 28px 22px}
+  #answer-text{font-size:14px;max-height:54%}
+  #centre{padding:0 20px 130px}
+  #input-wrap{bottom:24px}
+  #wordmark{top:20px;left:20px;font-size:17px}
+  #state-label{top:22px;right:20px}
 }
 </style>
 </head>
@@ -382,42 +210,28 @@ body{
 <div id="cursor-ring"></div>
 <canvas id="bg"></canvas>
 
-<!-- Top bar -->
-<div id="wordmark">HEALTH-TECH</div>
-<button id="themeBtn" onclick="toggleTheme()">🌙 Dark</button>
+<div id="wordmark">HEALTHQ</div>
+
 <div id="state-label">
   <div id="state-dot"></div>
   <div class="wv"><span></span><span></span><span></span><span></span><span></span></div>
   <span id="state-text">Idle</span>
 </div>
 
-<!-- Centre stage: orb bg + answer on top + hint + ARIA name -->
 <div id="centre">
-
-  <!-- Answer card — floats over orb center -->
-  <div id="answer-card">
+  <div id="idle-hint">Ask me anything about your health</div>
+  <div id="orb-answer">
     <div id="answer-text"></div>
     <div class="answer-footer">
-      <span class="src-tag" id="src-tag">Health-Tech</span>
+      <span class="src-tag" id="src-tag">HealthQ · AI</span>
       <button id="speakBtn" onclick="toggleSpeak()">
         <div class="speak-bars"><b></b><b></b><b></b></div>
         Read aloud
       </button>
     </div>
   </div>
-
-  <!-- Idle hint — exactly centered when no answer -->
-  <div id="idle-hint">Ask me anything about your health</div>
-
-  <!-- ARIA name below orb -->
-  <div id="orb-name">
-    <div class="oname">ARIA</div>
-    <div class="otagline">Health Assistant</div>
-  </div>
-
 </div>
 
-<!-- Input bar -->
 <div id="input-wrap">
   <div class="ig">
     <div class="ii">
@@ -433,19 +247,11 @@ body{
   <div id="hint">Press Enter · Click Ask · or use Voice</div>
 </div>
 
-<!-- Footer -->
-<footer class="site-footer">
-  <div class="footer-copy">© 2025 Health-Tech · Built by <span class="lime">Devanshu Sharma & Team</span> · College Project</div>
-  <div class="footer-links">
-    <a href="report.html">Project Report</a>
-    <a href="mailto:devanshusharmapc@gmail.com">Contact</a>
-  </div>
-</footer>
-
 <!-- ═══ 3D SCENE — Siri-Style Morph Orb ═══ -->
 <script>
 window.aiState='idle';
 (function(){
+  const isLightTheme=window.matchMedia('(prefers-color-scheme: light)').matches;
   const canvas=document.getElementById('bg');
   const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
   renderer.setPixelRatio(Math.min(devicePixelRatio,2));
@@ -454,7 +260,7 @@ window.aiState='idle';
   renderer.toneMapping=THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure=1.5;
   const scene=new THREE.Scene();
-  scene.fog=new THREE.FogExp2(0x04060f,0.010);
+  scene.fog=new THREE.FogExp2(isLightTheme?0xe8f1ff:0x04060f,isLightTheme?0.0075:0.010);
   const camera=new THREE.PerspectiveCamera(42,innerWidth/innerHeight,0.1,200);
   camera.position.set(0,0,24);
   scene.add(new THREE.AmbientLight(0xffffff,0.06));
@@ -500,8 +306,8 @@ window.aiState='idle';
   const uI=mkU(0xffffff,0xb9ff66,.55);
   const iOrb=new THREE.Mesh(new THREE.SphereGeometry(3.1,64,64),new THREE.ShaderMaterial({vertexShader:VS,fragmentShader:FSi,uniforms:uI,transparent:true,depthWrite:false}));
   scene.add(iOrb);
-  scene.add(new THREE.Mesh(new THREE.SphereGeometry(7,32,32),new THREE.MeshBasicMaterial({color:0x4facfe,transparent:true,opacity:.025,side:THREE.BackSide})));
-  scene.add(new THREE.Mesh(new THREE.SphereGeometry(10,32,32),new THREE.MeshBasicMaterial({color:0xb9ff66,transparent:true,opacity:.012,side:THREE.BackSide})));
+  scene.add(new THREE.Mesh(new THREE.SphereGeometry(7,32,32),new THREE.MeshBasicMaterial({color:isLightTheme?0x60a5fa:0x4facfe,transparent:true,opacity:isLightTheme ? .048 : .025,side:THREE.BackSide})));
+  scene.add(new THREE.Mesh(new THREE.SphereGeometry(10,32,32),new THREE.MeshBasicMaterial({color:isLightTheme?0x86efac:0xb9ff66,transparent:true,opacity:isLightTheme ? .024 : .012,side:THREE.BackSide})));
 
   const NRINGS=10,wR=[];
   for(let i=0;i<NRINGS;i++){
@@ -529,12 +335,12 @@ window.aiState='idle';
     requestAnimationFrame(loop);
     const st=window.aiState||'idle';
     let ta,ts,wc1=0xb9ff66,wc2=0x4facfe,wOn=false;
-    if(st==='speaking'){ta=.90;ts=3.5;wOn=true;wc1=0xb9ff66;wc2=0x00ffaa;}
-    else if(st==='thinking'){ta=.68;ts=2.5;wc1=0x4facfe;wc2=0xa78bfa;}
-    else{ta=.38;ts=1.4;}
+    if(st==='speaking'){ta=.80;ts=2.4;wOn=true;wc1=0xb9ff66;wc2=0x00ffaa;}
+    else if(st==='thinking'){ta=.58;ts=1.6;wc1=0x4facfe;wc2=0xa78bfa;}
+    else{ta=.34;ts=.75;}
     tC1.set(wc1);tC2.set(wc2);
     curAmp+=(ta-curAmp)*.038; curSpd+=(ts-curSpd)*.038;
-    t+=.008*curSpd;
+    t+=.005*curSpd;
     uO.uTime.value=t; uO.uAmp.value=curAmp;
     uO.uCA.value.lerp(tC1,.03); uO.uCB.value.lerp(tC2,.03);
     uI.uTime.value=t*1.15; uI.uAmp.value=curAmp*.6;
@@ -562,50 +368,21 @@ window.aiState='idle';
 
 <!-- ═══ APP LOGIC ═══ -->
 <script>
-// ── Cursor — works on all devices ──
 const isTouch=('ontouchstart' in window)||navigator.maxTouchPoints>0;
-const dot=document.getElementById('cursor');
-const ring=document.getElementById('cursor-ring');
+const dot=document.getElementById('cursor'),ring=document.getElementById('cursor-ring');
 if(!isTouch){
-  let dx=window.innerWidth/2, dy=window.innerHeight/2;
-  let rx=dx, ry=dy;
-  document.addEventListener('mousemove',e=>{dx=e.clientX;dy=e.clientY;});
-  (function cursorLoop(){
-    requestAnimationFrame(cursorLoop);
-    rx+=(dx-rx)*.10; ry+=(dy-ry)*.10;
-    dot.style.left=dx+'px'; dot.style.top=dy+'px';
-    ring.style.left=rx+'px'; ring.style.top=ry+'px';
-  })();
-  document.querySelectorAll('button,input,select,a').forEach(el=>{
+  let dx=0,dy=0,rx=0,ry=0;
+  document.addEventListener('mousemove',e=>{dx=e.clientX;dy=e.clientY});
+  (function loop(){requestAnimationFrame(loop);rx+=(dx-rx)*.10;ry+=(dy-ry)*.10;dot.style.left=dx+'px';dot.style.top=dy+'px';ring.style.left=rx+'px';ring.style.top=ry+'px';})();
+  document.querySelectorAll('button,input,select').forEach(el=>{
     el.addEventListener('mouseenter',()=>{dot.classList.add('hover');ring.classList.add('hover')});
     el.addEventListener('mouseleave',()=>{dot.classList.remove('hover');ring.classList.remove('hover')});
   });
-} else {
-  dot.style.display='none';
-  ring.style.display='none';
-  document.body.style.cursor='auto';
 }
 
-// ── State ──
 const API='';
 let currentLang='en', lastAnswer='';
-let chatMessages=[];
 
-// ── Theme toggle ──
-function toggleTheme(){
-  const h=document.documentElement;
-  const isDark=h.getAttribute('data-theme')==='dark';
-  h.setAttribute('data-theme',isDark?'light':'dark');
-  document.getElementById('themeBtn').textContent=isDark?'☀️ Light':'🌙 Dark';
-  localStorage.setItem('hq-theme',isDark?'light':'dark');
-}
-(function(){
-  const saved=localStorage.getItem('hq-theme')||'light';
-  document.documentElement.setAttribute('data-theme',saved);
-  document.getElementById('themeBtn').textContent=saved==='dark'?'🌙 Dark':'☀️ Light';
-})();
-
-// ── AI state ──
 function setAIState(s){
   window.aiState=s;
   const lbl=document.getElementById('state-label');
@@ -613,30 +390,22 @@ function setAIState(s){
   lbl.className=s==='idle'?'':s;
 }
 
-// ── Show answer INSIDE the orb ──
 function showAnswer(text,source){
   lastAnswer=text;
-  const card=document.getElementById('answer-card');
+  const card=document.getElementById('orb-answer');
   const el=document.getElementById('answer-text');
-  document.getElementById('src-tag').textContent=
-    source==='ai'?'Groq AI · LLaMA 3 70B':
-    source==='wikipedia'?'Wikipedia · Health Article':
-    source==='filter'?'Health-Tech · Health Only':
-    'Health-Tech · Database';
-  // Hide idle hint
+  document.getElementById('src-tag').textContent=source==='ai'?'Groq AI · LLaMA 3 70B':source==='wikipedia'?'Wikipedia · Health Article':'HealthQ · Database';
   document.getElementById('idle-hint').style.opacity='0';
-  document.getElementById('idle-hint').style.pointerEvents='none';
   card.classList.remove('visible');
   el.textContent='';
-  void card.offsetWidth;
+  void card.offsetWidth; // reflow
   card.classList.add('visible');
   typewriterInto(el,text,()=>setTimeout(()=>doSpeak(text),200));
 }
 
 function hideAnswer(){
-  document.getElementById('answer-card').classList.remove('visible');
+  document.getElementById('orb-answer').classList.remove('visible');
   document.getElementById('idle-hint').style.opacity='1';
-  document.getElementById('idle-hint').style.pointerEvents='none';
 }
 
 function typewriterInto(el,text,onDone){
@@ -645,7 +414,6 @@ function typewriterInto(el,text,onDone){
   tick();
 }
 
-// ── TTS ──
 const speakBtn=document.getElementById('speakBtn');
 function doSpeak(text){
   speechSynthesis.cancel();
@@ -662,7 +430,6 @@ function toggleSpeak(){
   else if(lastAnswer){doSpeak(lastAnswer);}
 }
 
-// ── Language ──
 function onLangChange(){
   currentLang=document.getElementById('langSelect').value;
   if(rec) rec.lang=currentLang==='hi'?'hi-IN':'en-IN';
@@ -681,7 +448,6 @@ function onLangChange(){
 }
 document.getElementById('qi').addEventListener('keydown',e=>{if(e.key==='Enter')ask()});
 
-// ── Voice input ──
 const vBtn=document.getElementById('voiceBtn'),hintEl=document.getElementById('hint');
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
 let rec=null,listening=false;
@@ -700,7 +466,6 @@ function stopVoice(){
   setTimeout(()=>{hintEl.textContent=currentLang==='hi'?'Enter दबाएं · Ask करें · या Voice उपयोग करें':'Press Enter · Click Ask · or use Voice'},2500);
 }
 
-// ── Main ask ──
 async function ask(){
   const inp=document.getElementById('qi');
   const question=inp.value.trim();
@@ -713,27 +478,16 @@ async function ask(){
   const btn=document.getElementById('askBtn');
   btn.disabled=true;btn.textContent='…';
   try{
-    chatMessages.push({role:'user',content:question});
-    if(chatMessages.length>12) chatMessages=chatMessages.slice(-12);
-    const res=await fetch(`${API}/api/ask`,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({question,messages:chatMessages,language:currentLang})
-    });
+    const res=await fetch(`${API}/api/ask`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question,language:currentLang})});
     const data=await res.json();
     setAIState('idle');
-    if(data.success){
-      chatMessages.push({role:'assistant',content:data.answer});
-      showAnswer(data.answer,data.source);
-    } else {
-      showAnswer(data.error||'Something went wrong. Please try again.','error');
-    }
+    if(data.success){showAnswer(data.answer,data.source);}
+    else{showAnswer(data.error||'Something went wrong. Please try again.','error');}
   } catch(e){
     setAIState('idle');
     showAnswer('Cannot reach server. Make sure it is running: node server.js','error');
   }
-  btn.disabled=false;
-  btn.textContent=currentLang==='hi'?'पूछें':'Ask';
+  btn.disabled=false;btn.textContent=currentLang==='hi'?'पूछें':'Ask';
 }
 </script>
 </body>
