@@ -513,22 +513,105 @@ window.aiState='idle';
   const iOrb=new THREE.Mesh(new THREE.SphereGeometry(3.1,64,64),new THREE.ShaderMaterial({vertexShader:VS,fragmentShader:FSi,uniforms:uI,transparent:true,depthWrite:false}));
   scene.add(iOrb);
 
-  // Eyes are part of the 3D orb model (not UI overlay)
+  // Eyes live inside the orb as a calm glass-face cavity with glowing slit pupils.
+  function drawEyeShape(ctx,w,h){
+    const cx=w*.5;
+    const top=h*.08;
+    const midTop=h*.3;
+    const midBot=h*.74;
+    const bottom=h*.94;
+    ctx.beginPath();
+    ctx.moveTo(cx,top);
+    ctx.bezierCurveTo(w*.8,top,w*.88,midTop,w*.76,midBot);
+    ctx.bezierCurveTo(w*.7,h*.86,w*.6,h*.92,cx,bottom);
+    ctx.bezierCurveTo(w*.4,h*.92,w*.3,h*.86,w*.24,midBot);
+    ctx.bezierCurveTo(w*.12,midTop,w*.2,top,cx,top);
+    ctx.closePath();
+  }
+  function mkTex(draw,w,h){
+    const canvas=document.createElement('canvas');
+    canvas.width=w; canvas.height=h;
+    const ctx=canvas.getContext('2d');
+    draw(ctx,w,h);
+    const tex=new THREE.CanvasTexture(canvas);
+    tex.needsUpdate=true;
+    tex.generateMipmaps=false;
+    tex.minFilter=THREE.LinearFilter;
+    tex.magFilter=THREE.LinearFilter;
+    return tex;
+  }
+  const eyeCoreTex=mkTex((ctx,w,h)=>{
+    const grad=ctx.createLinearGradient(0,0,0,h);
+    grad.addColorStop(0,'rgba(255,255,255,.95)');
+    grad.addColorStop(.25,'rgba(255,255,255,1)');
+    grad.addColorStop(.78,'rgba(255,255,255,.96)');
+    grad.addColorStop(1,'rgba(255,255,255,.88)');
+    ctx.fillStyle=grad;
+    drawEyeShape(ctx,w,h);
+    ctx.shadowColor='rgba(255,255,255,.65)';
+    ctx.shadowBlur=26;
+    ctx.fill();
+  },164,328);
+  const eyeLineTex=mkTex((ctx,w,h)=>{
+    ctx.clearRect(0,0,w,h);
+    ctx.strokeStyle='rgba(255,255,255,.95)';
+    ctx.lineWidth=7;
+    ctx.lineCap='round';
+    ctx.globalAlpha=.92;
+    [-20,0,20].forEach((offset,idx)=>{
+      ctx.beginPath();
+      ctx.moveTo(w*.5+offset,h*.12);
+      ctx.bezierCurveTo(w*.46+offset,h*.32+(idx===1?8:0),w*.54+offset,h*.58,w*.5+offset,h*.88);
+      ctx.stroke();
+    });
+  },164,328);
+  const faceGlowMat=new THREE.MeshBasicMaterial({color:0xd7f2ff,transparent:true,opacity:.16,depthWrite:false,blending:THREE.AdditiveBlending});
+  const faceCoreMat=new THREE.MeshBasicMaterial({color:0x060f1c,transparent:true,opacity:.84,depthWrite:false});
+  const faceShadeMat=new THREE.MeshBasicMaterial({color:0x02070e,transparent:true,opacity:.36,depthWrite:false});
+  const faceGlow=new THREE.Mesh(new THREE.SphereGeometry(2.02,40,40),faceGlowMat);
+  faceGlow.position.set(0,.92,2.92);
+  faceGlow.scale.set(1.52,1.06,.2);
+  faceGlow.renderOrder=2;
+  const faceCore=new THREE.Mesh(new THREE.SphereGeometry(1.66,40,40),faceCoreMat);
+  faceCore.position.set(0,.82,2.62);
+  faceCore.scale.set(1.62,1.08,.38);
+  faceCore.renderOrder=3;
+  const faceShade=new THREE.Mesh(new THREE.SphereGeometry(1.44,32,32),faceShadeMat);
+  faceShade.position.set(0,1.02,2.78);
+  faceShade.scale.set(1.5,.72,.16);
+  faceShade.renderOrder=4;
+
   function mkOrbEye(x){
     const g=new THREE.Group();
     g.position.set(x,0,0);
-    const whiteMat=new THREE.MeshBasicMaterial({color:0xeef6ff,transparent:true,opacity:.95,depthWrite:false});
-    const pupilMat=new THREE.MeshBasicMaterial({color:0x0b1220,transparent:true,opacity:.96,depthWrite:false});
-    const white=new THREE.Mesh(new THREE.SphereGeometry(.34,18,18),whiteMat);
-    white.scale.set(1,.72,.33);
-    const pupil=new THREE.Mesh(new THREE.SphereGeometry(.11,14,14),pupilMat);
-    pupil.position.z=.17;
-    g.add(white); g.add(pupil);
-    return {group:g,white,pupil,whiteMat,pupilMat};
+    const glowMat=new THREE.MeshBasicMaterial({map:eyeCoreTex,color:0x8fe6ff,transparent:true,opacity:.4,depthWrite:false,blending:THREE.AdditiveBlending});
+    const coreMat=new THREE.MeshBasicMaterial({map:eyeCoreTex,color:0x6abaff,transparent:true,opacity:.98,depthWrite:false});
+    const lineMat=new THREE.MeshBasicMaterial({map:eyeLineTex,color:0x3a67e0,transparent:true,opacity:.62,depthWrite:false});
+    const glow=new THREE.Mesh(new THREE.PlaneGeometry(.92,1.62),glowMat);
+    const core=new THREE.Mesh(new THREE.PlaneGeometry(.56,1.14),coreMat);
+    const lines=new THREE.Mesh(new THREE.PlaneGeometry(.42,1.02),lineMat);
+    glow.position.z=.01;
+    core.position.z=.05;
+    lines.position.z=.08;
+    glow.renderOrder=5;
+    core.renderOrder=6;
+    lines.renderOrder=7;
+    g.add(glow);
+    g.add(core);
+    g.add(lines);
+    return {
+      group:g,glow,core,lines,glowMat,coreMat,lineMat,
+      baseGlowX:.92,baseGlowY:1.62,
+      baseCoreX:.56,baseCoreY:1.14,
+      baseLineX:.42,baseLineY:1.02
+    };
   }
   const eyeRig=new THREE.Group();
-  eyeRig.position.set(0,.52,3.18);
-  const eyeL=mkOrbEye(-.78),eyeR=mkOrbEye(.78);
+  eyeRig.position.set(0,.78,3.04);
+  eyeRig.add(faceGlow);
+  eyeRig.add(faceCore);
+  eyeRig.add(faceShade);
+  const eyeL=mkOrbEye(-.64),eyeR=mkOrbEye(.64);
   eyeRig.add(eyeL.group); eyeRig.add(eyeR.group);
   scene.add(eyeRig);
 
@@ -537,7 +620,7 @@ window.aiState='idle';
   scene.add(new THREE.Mesh(new THREE.SphereGeometry(7,32,32),shellA));
   scene.add(new THREE.Mesh(new THREE.SphereGeometry(10,32,32),shellB));
 
-  let starTarget=1,cloudTarget=0,eyeOpen=.96,nextBlink=1.6+Math.random()*2.4,blinkPhase=0;
+  let starTarget=1,cloudTarget=0,eyeOpen=.96,nextBlink=2.2+Math.random()*2.8,blinkPhase=0;
   function applySceneTheme(theme){
     const isLight=theme==='light';
     scene.fog.color.setHex(isLight?0xdff2ff:0x020617);
@@ -549,10 +632,17 @@ window.aiState='idle';
     ptB.color.setHex(isLight?0x7dd3fc:0x4facfe);
     ptL.color.setHex(isLight?0xffd166:0xb9ff66);
     ptP.color.setHex(isLight?0xffffff:0xa78bfa);
-    eyeL.whiteMat.color.setHex(isLight?0xffffff:0xeef6ff);
-    eyeR.whiteMat.color.setHex(isLight?0xffffff:0xeef6ff);
-    eyeL.pupilMat.color.setHex(isLight?0x173447:0x0b1220);
-    eyeR.pupilMat.color.setHex(isLight?0x173447:0x0b1220);
+    faceCoreMat.color.setHex(isLight?0x14293b:0x060f1c);
+    faceCoreMat.opacity=isLight ? .42 : .84;
+    faceShadeMat.color.setHex(isLight?0x08111a:0x02070e);
+    faceShadeMat.opacity=isLight ? .18 : .36;
+    faceGlowMat.color.setHex(isLight?0xf5fbff:0xd7f2ff);
+    faceGlowMat.opacity=isLight ? .2 : .16;
+    [eyeL,eyeR].forEach(e=>{
+      e.glowMat.color.setHex(isLight?0xbfe8ff:0x90e4ff);
+      e.coreMat.color.setHex(isLight?0x74c2ff:0x69bfff);
+      e.lineMat.color.setHex(isLight?0x4f89dd:0x3663dc);
+    });
     starTarget=isLight?0:1;
     cloudTarget=isLight?1:0;
   }
@@ -624,27 +714,48 @@ window.aiState='idle';
     orb.rotation.y=t*.07; orb.rotation.x=t*.035;
     iOrb.rotation.y=-t*.055; iOrb.rotation.x=-t*.028;
 
-    let eyeTarget=1,lookX=mx*.06,lookY=-my*.05;
+    let eyeTarget=1,glowBoost=1,driftY=0,scanX=0;
     if(eyeState==='answering'||eyeState==='speaking'){
-      eyeTarget=.08; lookX=0; lookY=0;
+      eyeTarget=.06;
+      glowBoost=.9;
     }else if(eyeState==='thinking'){
-      eyeTarget=.58; lookX=Math.sin(t*3.4)*.08; lookY=Math.cos(t*2.8)*.05;
-      blinkPhase=0; nextBlink=1.4+Math.random()*1.8;
+      eyeTarget=.82+Math.sin(t*2.3)*.035;
+      glowBoost=1.16+((Math.sin(t*4.4)+1)*.08);
+      driftY=Math.sin(t*1.4)*.014;
+      scanX=Math.sin(t*1.3)*.035;
+      blinkPhase=0;
+      nextBlink=1.6+Math.random()*2.2;
     }else{
       nextBlink-=.016;
-      if(nextBlink<=0&&blinkPhase===0){blinkPhase=1;nextBlink=2.2+Math.random()*2.8;}
-      if(blinkPhase>0){eyeTarget=.08;blinkPhase-=.22;}
+      if(nextBlink<=0&&blinkPhase===0){blinkPhase=.18;nextBlink=2.6+Math.random()*3.4;}
+      if(blinkPhase>0){eyeTarget=.09;blinkPhase-=.016;}
     }
-    eyeOpen+=(eyeTarget-eyeOpen)*.28;
-    const lid=Math.max(.08,eyeOpen);
-    const eyeScaleY=.72*lid;
+    eyeOpen+=(eyeTarget-eyeOpen)*.24;
+    const openness=Math.max(.06,eyeOpen);
     [eyeL,eyeR].forEach((e,idx)=>{
-      e.white.scale.y=eyeScaleY;
-      e.pupil.material.opacity=lid<.22?0:.96;
-      e.pupil.position.x=lookX+(idx===0?-.01:.01);
-      e.pupil.position.y=lookY;
+      const side=idx===0?-1:1;
+      const closeX=eyeState==='answering'||eyeState==='speaking' ? e.baseCoreX*1.18 : e.baseCoreX*(eyeState==='thinking' ? 1.03 : 1);
+      const glowX=e.baseGlowX*(eyeState==='thinking' ? 1.04 : 1);
+      const shift=scanX*side;
+      e.core.scale.x+=(closeX-e.core.scale.x)*.22;
+      e.core.scale.y+=(e.baseCoreY*openness-e.core.scale.y)*.22;
+      e.glow.scale.x+=(glowX-e.glow.scale.x)*.18;
+      e.glow.scale.y+=(e.baseGlowY*(.18+openness*.82)-e.glow.scale.y)*.18;
+      e.lines.scale.x+=(e.baseLineX-e.lines.scale.x)*.18;
+      e.lines.scale.y+=(e.baseLineY*Math.max(.1,openness)-e.lines.scale.y)*.2;
+      e.core.position.x+=(shift-e.core.position.x)*.14;
+      e.lines.position.x+=(shift*1.08-e.lines.position.x)*.14;
+      e.glow.position.x+=(shift*.4-e.glow.position.x)*.12;
+      e.glowMat.opacity=(eyeState==='thinking' ? .42 : .34)*glowBoost*(.16+openness*.84);
+      e.coreMat.opacity=.48+openness*.44;
+      e.lineMat.opacity=(eyeState==='thinking' ? .72 : .58)*(.18+openness*.82);
+      e.group.position.y=driftY+Math.sin(t*1.1+idx*.6)*.006;
     });
-    eyeRig.lookAt(camera.position);
+    faceGlow.scale.y=1.06+Math.sin(t*.9)*.014;
+    const faceGlowTarget=eyeState==='thinking' ? .26 : (root.getAttribute('data-theme')==='light' ? .2 : .16);
+    faceGlow.material.opacity+=(faceGlowTarget-faceGlow.material.opacity)*.08;
+    eyeRig.rotation.y=mx*.14;
+    eyeRig.rotation.x=-my*.06;
 
     wTimer+=.016;
     wR.forEach(r=>{
