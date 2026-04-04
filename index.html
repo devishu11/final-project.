@@ -107,26 +107,6 @@ html[data-theme='light'] #day-scenery{opacity:1}
   min-height:150px;
   background:linear-gradient(180deg,rgba(170,223,255,.08) 0%,rgba(132,205,255,.45) 42%,rgba(130,201,148,.56) 100%);
 }
-#day-scenery .hill-back{
-  position:absolute;
-  left:-8vw;
-  right:-8vw;
-  bottom:10vh;
-  height:22vh;
-  min-height:112px;
-  border-radius:50% 50% 0 0/100% 100% 0 0;
-  background:linear-gradient(180deg,#a3d78f 0%,#86c475 100%);
-}
-#day-scenery .hill-front{
-  position:absolute;
-  left:-12vw;
-  right:-12vw;
-  bottom:0;
-  height:20vh;
-  min-height:100px;
-  border-radius:48% 52% 0 0/100% 100% 0 0;
-  background:linear-gradient(180deg,#6eb35d 0%,#4e8f42 100%);
-}
 #day-scenery .mist{
   position:absolute;
   left:0;
@@ -384,8 +364,6 @@ html[data-theme='light'] #cursor{box-shadow:0 0 8px rgba(255,170,60,.75)}
   #page-footer{font-size:9px;letter-spacing:.35px;max-width:calc(100vw - 8px)}
   #day-scenery .sun-glow{width:44vmin;height:44vmin;right:2vmin}
   #day-scenery .horizon{height:30vh;min-height:120px}
-  #day-scenery .hill-back{height:18vh;bottom:7vh;min-height:84px}
-  #day-scenery .hill-front{height:16vh;min-height:74px}
 }
 
 @media (max-width:390px){
@@ -404,8 +382,6 @@ html[data-theme='light'] #cursor{box-shadow:0 0 8px rgba(255,170,60,.75)}
   #input-wrap{bottom:calc(max(24px,calc(var(--safe-bottom) + 18px)) + var(--kb-offset))}
   #page-footer{font-size:8px;opacity:.86}
   #day-scenery .horizon{height:24vh}
-  #day-scenery .hill-back{height:14vh;bottom:5vh}
-  #day-scenery .hill-front{height:12vh}
 }
 
 @media (max-width:320px){
@@ -426,8 +402,6 @@ html[data-theme='light'] #cursor{box-shadow:0 0 8px rgba(255,170,60,.75)}
 <div id="day-scenery" aria-hidden="true">
   <div class="sun-glow"></div>
   <div class="horizon"></div>
-  <div class="hill-back"></div>
-  <div class="hill-front"></div>
   <div class="mist"></div>
 </div>
 
