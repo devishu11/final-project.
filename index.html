@@ -35,6 +35,10 @@
   --input-bg:rgba(4,8,22,.92);
   --input-option-bg:#04060f;
   --orb-text:rgba(255,255,255,.9);
+  --eye-sclera:rgba(236,246,255,.92);
+  --eye-border:rgba(120,165,255,.45);
+  --eye-pupil:#0b1220;
+  --eye-lid:rgba(4,9,22,.92);
 }
 html,body{height:100%;overflow:hidden}
 body{
@@ -57,6 +61,10 @@ html[data-theme='light']{
   --input-bg:rgba(255,255,255,.93);
   --input-option-bg:#f8fbff;
   --orb-text:rgba(17,41,58,.96);
+  --eye-sclera:rgba(255,255,255,.96);
+  --eye-border:rgba(19,49,69,.35);
+  --eye-pupil:#173447;
+  --eye-lid:rgba(191,232,255,.94);
 }
 html[data-theme='light'] body{
   background:
@@ -172,14 +180,77 @@ html[data-theme='light'] #day-scenery{opacity:1}
   transform:scale(.9);
   transition:opacity .55s cubic-bezier(.16,1,.3,1),transform .55s cubic-bezier(.16,1,.3,1);
   pointer-events:auto;
+  position:relative;
   display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:space-between;
   gap:10px;
-  padding:62px 34px 28px;
+  padding:88px 34px 28px;
 }
 #orb-answer.visible{opacity:1;transform:scale(1)}
+#orb-face{
+  position:absolute;
+  top:22%;
+  left:50%;
+  transform:translateX(-50%);
+  width:min(180px,66%);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  pointer-events:none;
+  z-index:2;
+}
+.orb-eye{
+  position:relative;
+  width:46px;
+  height:30px;
+  border-radius:24px;
+  background:var(--eye-sclera);
+  border:1.5px solid var(--eye-border);
+  overflow:hidden;
+  box-shadow:0 0 12px rgba(255,255,255,.16);
+  transition:transform .22s ease,height .22s ease,opacity .22s ease;
+}
+.orb-pupil{
+  position:absolute;
+  width:14px;
+  height:14px;
+  border-radius:50%;
+  top:50%;
+  left:50%;
+  background:var(--eye-pupil);
+  transform:translate(-50%,-50%);
+  transition:opacity .16s ease,transform .16s ease;
+}
+.orb-lid{
+  position:absolute;
+  left:-3px;
+  right:-3px;
+  height:0%;
+  background:var(--eye-lid);
+  transition:height .22s ease;
+}
+.orb-lid.top{top:-2px;border-bottom:1px solid var(--eye-border)}
+.orb-lid.bottom{bottom:-2px;border-top:1px solid var(--eye-border)}
+#orb-face.idle .orb-eye .orb-lid{animation:orbBlink 5.4s ease-in-out infinite}
+#orb-face.thinking .orb-eye{height:24px;transform:translateY(-1px)}
+#orb-face.thinking .orb-pupil{animation:pupilThink 1.1s ease-in-out infinite}
+#orb-face.thinking .orb-lid.top,#orb-face.thinking .orb-lid.bottom{height:14%}
+#orb-face.answering .orb-lid.top,#orb-face.answering .orb-lid.bottom,
+#orb-face.speaking .orb-lid.top,#orb-face.speaking .orb-lid.bottom{height:52%;animation:none}
+#orb-face.answering .orb-pupil,#orb-face.speaking .orb-pupil{opacity:0}
+@keyframes orbBlink{
+  0%,90%,100%{height:0%}
+  93%,97%{height:52%}
+}
+@keyframes pupilThink{
+  0%{transform:translate(-55%,-50%)}
+  25%{transform:translate(-30%,-40%)}
+  50%{transform:translate(-68%,-50%)}
+  75%{transform:translate(-38%,-58%)}
+  100%{transform:translate(-55%,-50%)}
+}
 #answer-text{
   width:100%;
   flex:1;
@@ -332,7 +403,7 @@ html[data-theme='light'] #cursor{box-shadow:0 0 8px rgba(255,170,60,.75)}
 }
 
 @media (max-width:1024px){
-  #orb-answer{width:clamp(232px,56vmin,352px);height:clamp(232px,56vmin,352px);padding:56px 28px 24px}
+  #orb-answer{width:clamp(232px,56vmin,352px);height:clamp(232px,56vmin,352px);padding:78px 28px 24px}
   #centre{padding:calc(var(--safe-top) + 56px) 20px calc(var(--safe-bottom) + 150px)}
 }
 
@@ -346,7 +417,10 @@ html[data-theme='light'] #cursor{box-shadow:0 0 8px rgba(255,170,60,.75)}
   #state-label .wv{display:none}
   #idle-hint{font-size:clamp(15px,4.8vw,20px);line-height:1.25}
   #centre{padding:calc(var(--safe-top) + 76px) 14px calc(var(--safe-bottom) + 136px)}
-  #orb-answer{width:clamp(220px,72vw,322px);height:clamp(220px,72vw,322px);padding:52px 20px 18px}
+  #orb-answer{width:clamp(220px,72vw,322px);height:clamp(220px,72vw,322px);padding:72px 20px 18px}
+  #orb-face{top:20%;width:min(152px,70%)}
+  .orb-eye{width:40px;height:26px}
+  .orb-pupil{width:12px;height:12px}
   #answer-text{font-size:14px}
   #answer-text.len-md{font-size:13px}
   #answer-text.len-lg{font-size:12px}
@@ -367,7 +441,10 @@ html[data-theme='light'] #cursor{box-shadow:0 0 8px rgba(255,170,60,.75)}
 }
 
 @media (max-width:390px){
-  #orb-answer{width:clamp(206px,78vw,286px);height:clamp(206px,78vw,286px);padding:46px 16px 14px}
+  #orb-answer{width:clamp(206px,78vw,286px);height:clamp(206px,78vw,286px);padding:66px 16px 14px}
+  #orb-face{top:19%;width:min(138px,72%)}
+  .orb-eye{width:35px;height:24px}
+  .orb-pupil{width:11px;height:11px}
   #src-tag{display:none}
   .answer-footer{justify-content:center;border-top:none;padding-top:4px}
   #askBtn{padding:0 10px}
@@ -377,7 +454,10 @@ html[data-theme='light'] #cursor{box-shadow:0 0 8px rgba(255,170,60,.75)}
 @media (max-height:560px) and (orientation:landscape){
   #centre{justify-content:flex-start;padding:calc(var(--safe-top) + 54px) 16px calc(var(--safe-bottom) + 108px)}
   #idle-hint{font-size:14px;letter-spacing:.4px}
-  #orb-answer{width:clamp(182px,42vh,248px);height:clamp(182px,42vh,248px);padding:30px 16px 12px}
+  #orb-answer{width:clamp(182px,42vh,248px);height:clamp(182px,42vh,248px);padding:48px 16px 12px}
+  #orb-face{top:18%;width:min(124px,72%)}
+  .orb-eye{width:31px;height:21px}
+  .orb-pupil{width:10px;height:10px}
   #answer-text{font-size:13px}
   #input-wrap{bottom:calc(max(24px,calc(var(--safe-bottom) + 18px)) + var(--kb-offset))}
   #page-footer{font-size:8px;opacity:.86}
@@ -417,6 +497,18 @@ html[data-theme='light'] #cursor{box-shadow:0 0 8px rgba(255,170,60,.75)}
 <div id="centre">
   <div id="idle-hint">Ask me anything about your health</div>
   <div id="orb-answer">
+    <div id="orb-face" class="idle" aria-hidden="true">
+      <div class="orb-eye">
+        <div class="orb-pupil"></div>
+        <div class="orb-lid top"></div>
+        <div class="orb-lid bottom"></div>
+      </div>
+      <div class="orb-eye">
+        <div class="orb-pupil"></div>
+        <div class="orb-lid top"></div>
+        <div class="orb-lid bottom"></div>
+      </div>
+    </div>
     <div id="answer-text"></div>
     <div class="answer-footer">
       <span class="src-tag" id="src-tag">Model: Elevate</span>
@@ -673,6 +765,8 @@ const API='';
 const MODEL_NAME='Elevate';
 const USER_NAME_KEY='health-teach-user-name';
 let currentLang='en', lastAnswer='', userName='Friend';
+const orbFace=document.getElementById('orb-face');
+let faceOverride='';
 
 function cleanName(raw){
   const value=(raw||'').replace(/[^a-zA-Z\s]/g,'').trim().replace(/\s+/g,' ');
@@ -781,18 +875,31 @@ userName=getUserName();
 updateBranding();
 updateIdleHint();
 
+function applyFaceState(){
+  if(!orbFace) return;
+  const state=faceOverride||window.aiState||'idle';
+  orbFace.className=state;
+}
+function setFaceOverride(state){
+  faceOverride=state||'';
+  applyFaceState();
+}
+
 function setAIState(s){
   window.aiState=s;
   const lbl=document.getElementById('state-label');
   document.getElementById('state-text').textContent=s==='thinking'?'Thinking…':s==='speaking'?'Speaking':'Idle';
   lbl.className=s==='idle'?'':s;
+  applyFaceState();
 }
+applyFaceState();
 
 function showAnswer(text,source){
   const oneLineAnswer=formatSingleLineAnswer(text);
   lastAnswer=oneLineAnswer;
   const card=document.getElementById('orb-answer');
   const el=document.getElementById('answer-text');
+  setFaceOverride('answering');
   document.getElementById('src-tag').textContent=source==='ai'
     ? 'Model: '+MODEL_NAME+' (Groq)'
     : source==='wikipedia'
@@ -810,6 +917,7 @@ function showAnswer(text,source){
 function hideAnswer(){
   document.getElementById('orb-answer').classList.remove('visible');
   document.getElementById('idle-hint').style.opacity='1';
+  setFaceOverride('');
   updateIdleHint();
 }
 
@@ -825,14 +933,14 @@ function doSpeak(text){
   const u=new SpeechSynthesisUtterance(text);
   u.lang=currentLang==='hi'?'hi-IN':'en-IN';
   u.rate=.92;u.pitch=1;
-  u.onstart=()=>{beginSpeechSync(text);speakBtn.classList.add('on');setAIState('speaking')};
+  u.onstart=()=>{setFaceOverride('');beginSpeechSync(text);speakBtn.classList.add('on');setAIState('speaking')};
   u.onboundary=e=>{if(typeof e.charIndex==='number') updateSpeechSync(e.charIndex);};
-  u.onend=()=>{endSpeechSync();speakBtn.classList.remove('on');setAIState('idle')};
-  u.onerror=()=>{endSpeechSync();speakBtn.classList.remove('on');setAIState('idle')};
+  u.onend=()=>{setFaceOverride('');endSpeechSync();speakBtn.classList.remove('on');setAIState('idle')};
+  u.onerror=()=>{setFaceOverride('');endSpeechSync();speakBtn.classList.remove('on');setAIState('idle')};
   speechSynthesis.speak(u);
 }
 function toggleSpeak(){
-  if(speechSynthesis.speaking){speechSynthesis.cancel();endSpeechSync();speakBtn.classList.remove('on');setAIState('idle');}
+  if(speechSynthesis.speaking){speechSynthesis.cancel();setFaceOverride('');endSpeechSync();speakBtn.classList.remove('on');setAIState('idle');}
   else if(lastAnswer){doSpeak(lastAnswer);}
 }
 
@@ -879,6 +987,7 @@ async function ask(){
   if(!question) return inp.focus();
   inp.value='';
   speechSynthesis.cancel();
+  setFaceOverride('');
   speakBtn.classList.remove('on');
   setAIState('thinking');
   hideAnswer();
