@@ -180,77 +180,14 @@ html[data-theme='light'] #day-scenery{opacity:1}
   transform:scale(.9);
   transition:opacity .55s cubic-bezier(.16,1,.3,1),transform .55s cubic-bezier(.16,1,.3,1);
   pointer-events:auto;
-  position:relative;
   display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:space-between;
   gap:10px;
-  padding:88px 34px 28px;
+  padding:62px 34px 28px;
 }
 #orb-answer.visible{opacity:1;transform:scale(1)}
-#orb-face{
-  position:absolute;
-  top:22%;
-  left:50%;
-  transform:translateX(-50%);
-  width:min(180px,66%);
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  pointer-events:none;
-  z-index:2;
-}
-.orb-eye{
-  position:relative;
-  width:46px;
-  height:30px;
-  border-radius:24px;
-  background:var(--eye-sclera);
-  border:1.5px solid var(--eye-border);
-  overflow:hidden;
-  box-shadow:0 0 12px rgba(255,255,255,.16);
-  transition:transform .22s ease,height .22s ease,opacity .22s ease;
-}
-.orb-pupil{
-  position:absolute;
-  width:14px;
-  height:14px;
-  border-radius:50%;
-  top:50%;
-  left:50%;
-  background:var(--eye-pupil);
-  transform:translate(-50%,-50%);
-  transition:opacity .16s ease,transform .16s ease;
-}
-.orb-lid{
-  position:absolute;
-  left:-3px;
-  right:-3px;
-  height:0%;
-  background:var(--eye-lid);
-  transition:height .22s ease;
-}
-.orb-lid.top{top:-2px;border-bottom:1px solid var(--eye-border)}
-.orb-lid.bottom{bottom:-2px;border-top:1px solid var(--eye-border)}
-#orb-face.idle .orb-eye .orb-lid{animation:orbBlink 5.4s ease-in-out infinite}
-#orb-face.thinking .orb-eye{height:24px;transform:translateY(-1px)}
-#orb-face.thinking .orb-pupil{animation:pupilThink 1.1s ease-in-out infinite}
-#orb-face.thinking .orb-lid.top,#orb-face.thinking .orb-lid.bottom{height:14%}
-#orb-face.answering .orb-lid.top,#orb-face.answering .orb-lid.bottom,
-#orb-face.speaking .orb-lid.top,#orb-face.speaking .orb-lid.bottom{height:52%;animation:none}
-#orb-face.answering .orb-pupil,#orb-face.speaking .orb-pupil{opacity:0}
-@keyframes orbBlink{
-  0%,90%,100%{height:0%}
-  93%,97%{height:52%}
-}
-@keyframes pupilThink{
-  0%{transform:translate(-55%,-50%)}
-  25%{transform:translate(-30%,-40%)}
-  50%{transform:translate(-68%,-50%)}
-  75%{transform:translate(-38%,-58%)}
-  100%{transform:translate(-55%,-50%)}
-}
 #answer-text{
   width:100%;
   flex:1;
@@ -403,7 +340,7 @@ html[data-theme='light'] #cursor{box-shadow:0 0 8px rgba(255,170,60,.75)}
 }
 
 @media (max-width:1024px){
-  #orb-answer{width:clamp(232px,56vmin,352px);height:clamp(232px,56vmin,352px);padding:78px 28px 24px}
+  #orb-answer{width:clamp(232px,56vmin,352px);height:clamp(232px,56vmin,352px);padding:56px 28px 24px}
   #centre{padding:calc(var(--safe-top) + 56px) 20px calc(var(--safe-bottom) + 150px)}
 }
 
@@ -417,10 +354,7 @@ html[data-theme='light'] #cursor{box-shadow:0 0 8px rgba(255,170,60,.75)}
   #state-label .wv{display:none}
   #idle-hint{font-size:clamp(15px,4.8vw,20px);line-height:1.25}
   #centre{padding:calc(var(--safe-top) + 76px) 14px calc(var(--safe-bottom) + 136px)}
-  #orb-answer{width:clamp(220px,72vw,322px);height:clamp(220px,72vw,322px);padding:72px 20px 18px}
-  #orb-face{top:20%;width:min(152px,70%)}
-  .orb-eye{width:40px;height:26px}
-  .orb-pupil{width:12px;height:12px}
+  #orb-answer{width:clamp(220px,72vw,322px);height:clamp(220px,72vw,322px);padding:52px 20px 18px}
   #answer-text{font-size:14px}
   #answer-text.len-md{font-size:13px}
   #answer-text.len-lg{font-size:12px}
@@ -441,10 +375,7 @@ html[data-theme='light'] #cursor{box-shadow:0 0 8px rgba(255,170,60,.75)}
 }
 
 @media (max-width:390px){
-  #orb-answer{width:clamp(206px,78vw,286px);height:clamp(206px,78vw,286px);padding:66px 16px 14px}
-  #orb-face{top:19%;width:min(138px,72%)}
-  .orb-eye{width:35px;height:24px}
-  .orb-pupil{width:11px;height:11px}
+  #orb-answer{width:clamp(206px,78vw,286px);height:clamp(206px,78vw,286px);padding:46px 16px 14px}
   #src-tag{display:none}
   .answer-footer{justify-content:center;border-top:none;padding-top:4px}
   #askBtn{padding:0 10px}
@@ -454,10 +385,7 @@ html[data-theme='light'] #cursor{box-shadow:0 0 8px rgba(255,170,60,.75)}
 @media (max-height:560px) and (orientation:landscape){
   #centre{justify-content:flex-start;padding:calc(var(--safe-top) + 54px) 16px calc(var(--safe-bottom) + 108px)}
   #idle-hint{font-size:14px;letter-spacing:.4px}
-  #orb-answer{width:clamp(182px,42vh,248px);height:clamp(182px,42vh,248px);padding:48px 16px 12px}
-  #orb-face{top:18%;width:min(124px,72%)}
-  .orb-eye{width:31px;height:21px}
-  .orb-pupil{width:10px;height:10px}
+  #orb-answer{width:clamp(182px,42vh,248px);height:clamp(182px,42vh,248px);padding:30px 16px 12px}
   #answer-text{font-size:13px}
   #input-wrap{bottom:calc(max(24px,calc(var(--safe-bottom) + 18px)) + var(--kb-offset))}
   #page-footer{font-size:8px;opacity:.86}
@@ -497,18 +425,6 @@ html[data-theme='light'] #cursor{box-shadow:0 0 8px rgba(255,170,60,.75)}
 <div id="centre">
   <div id="idle-hint">Ask me anything about your health</div>
   <div id="orb-answer">
-    <div id="orb-face" class="idle" aria-hidden="true">
-      <div class="orb-eye">
-        <div class="orb-pupil"></div>
-        <div class="orb-lid top"></div>
-        <div class="orb-lid bottom"></div>
-      </div>
-      <div class="orb-eye">
-        <div class="orb-pupil"></div>
-        <div class="orb-lid top"></div>
-        <div class="orb-lid bottom"></div>
-      </div>
-    </div>
     <div id="answer-text"></div>
     <div class="answer-footer">
       <span class="src-tag" id="src-tag">Model: Elevate</span>
@@ -596,12 +512,32 @@ window.aiState='idle';
   const uI=mkU(0xffffff,0xb9ff66,.55);
   const iOrb=new THREE.Mesh(new THREE.SphereGeometry(3.1,64,64),new THREE.ShaderMaterial({vertexShader:VS,fragmentShader:FSi,uniforms:uI,transparent:true,depthWrite:false}));
   scene.add(iOrb);
+
+  // Eyes are part of the 3D orb model (not UI overlay)
+  function mkOrbEye(x){
+    const g=new THREE.Group();
+    g.position.set(x,0,0);
+    const whiteMat=new THREE.MeshBasicMaterial({color:0xeef6ff,transparent:true,opacity:.95,depthWrite:false});
+    const pupilMat=new THREE.MeshBasicMaterial({color:0x0b1220,transparent:true,opacity:.96,depthWrite:false});
+    const white=new THREE.Mesh(new THREE.SphereGeometry(.34,18,18),whiteMat);
+    white.scale.set(1,.72,.33);
+    const pupil=new THREE.Mesh(new THREE.SphereGeometry(.11,14,14),pupilMat);
+    pupil.position.z=.17;
+    g.add(white); g.add(pupil);
+    return {group:g,white,pupil,whiteMat,pupilMat};
+  }
+  const eyeRig=new THREE.Group();
+  eyeRig.position.set(0,.52,3.18);
+  const eyeL=mkOrbEye(-.78),eyeR=mkOrbEye(.78);
+  eyeRig.add(eyeL.group); eyeRig.add(eyeR.group);
+  scene.add(eyeRig);
+
   const shellA=new THREE.MeshBasicMaterial({color:0x4facfe,transparent:true,opacity:.025,side:THREE.BackSide});
   const shellB=new THREE.MeshBasicMaterial({color:0xb9ff66,transparent:true,opacity:.012,side:THREE.BackSide});
   scene.add(new THREE.Mesh(new THREE.SphereGeometry(7,32,32),shellA));
   scene.add(new THREE.Mesh(new THREE.SphereGeometry(10,32,32),shellB));
 
-  let starTarget=1,cloudTarget=0;
+  let starTarget=1,cloudTarget=0,eyeOpen=.96,nextBlink=1.6+Math.random()*2.4,blinkPhase=0;
   function applySceneTheme(theme){
     const isLight=theme==='light';
     scene.fog.color.setHex(isLight?0xdff2ff:0x020617);
@@ -613,6 +549,10 @@ window.aiState='idle';
     ptB.color.setHex(isLight?0x7dd3fc:0x4facfe);
     ptL.color.setHex(isLight?0xffd166:0xb9ff66);
     ptP.color.setHex(isLight?0xffffff:0xa78bfa);
+    eyeL.whiteMat.color.setHex(isLight?0xffffff:0xeef6ff);
+    eyeR.whiteMat.color.setHex(isLight?0xffffff:0xeef6ff);
+    eyeL.pupilMat.color.setHex(isLight?0x173447:0x0b1220);
+    eyeR.pupilMat.color.setHex(isLight?0x173447:0x0b1220);
     starTarget=isLight?0:1;
     cloudTarget=isLight?1:0;
   }
@@ -668,6 +608,8 @@ window.aiState='idle';
   (function loop(){
     requestAnimationFrame(loop);
     const st=window.aiState||'idle';
+    const expr=window.orbExpression||'';
+    const eyeState=expr==='answering'?'answering':st;
     let ta,ts,wc1=0xb9ff66,wc2=0x4facfe,wOn=false;
     if(st==='speaking'){ta=.80;ts=2.4;wOn=true;wc1=0xb9ff66;wc2=0x00ffaa;}
     else if(st==='thinking'){ta=.58;ts=1.6;wc1=0x4facfe;wc2=0xa78bfa;}
@@ -681,6 +623,29 @@ window.aiState='idle';
     uI.uCA.value.lerp(new THREE.Color(0xffffff),.02); uI.uCB.value.lerp(tC1,.03);
     orb.rotation.y=t*.07; orb.rotation.x=t*.035;
     iOrb.rotation.y=-t*.055; iOrb.rotation.x=-t*.028;
+
+    let eyeTarget=1,lookX=mx*.06,lookY=-my*.05;
+    if(eyeState==='answering'||eyeState==='speaking'){
+      eyeTarget=.08; lookX=0; lookY=0;
+    }else if(eyeState==='thinking'){
+      eyeTarget=.58; lookX=Math.sin(t*3.4)*.08; lookY=Math.cos(t*2.8)*.05;
+      blinkPhase=0; nextBlink=1.4+Math.random()*1.8;
+    }else{
+      nextBlink-=.016;
+      if(nextBlink<=0&&blinkPhase===0){blinkPhase=1;nextBlink=2.2+Math.random()*2.8;}
+      if(blinkPhase>0){eyeTarget=.08;blinkPhase-=.22;}
+    }
+    eyeOpen+=(eyeTarget-eyeOpen)*.28;
+    const lid=Math.max(.08,eyeOpen);
+    const eyeScaleY=.72*lid;
+    [eyeL,eyeR].forEach((e,idx)=>{
+      e.white.scale.y=eyeScaleY;
+      e.pupil.material.opacity=lid<.22?0:.96;
+      e.pupil.position.x=lookX+(idx===0?-.01:.01);
+      e.pupil.position.y=lookY;
+    });
+    eyeRig.lookAt(camera.position);
+
     wTimer+=.016;
     wR.forEach(r=>{
       if(wOn){const p=((wTimer*.55+r.userData.phase)%1);r.scale.setScalar(4.2+p*13);r.material.opacity=(1-p)*(.28+curAmp*.18);r.material.color.set(wc1);r.rotation.x=Math.sin(r.userData.phase*6+t*.3)*.5;r.rotation.y=Math.cos(r.userData.phase*5+t*.2)*.4;}
@@ -765,8 +730,7 @@ const API='';
 const MODEL_NAME='Elevate';
 const USER_NAME_KEY='health-teach-user-name';
 let currentLang='en', lastAnswer='', userName='Friend';
-const orbFace=document.getElementById('orb-face');
-let faceOverride='';
+window.orbExpression=window.orbExpression||'';
 
 function cleanName(raw){
   const value=(raw||'').replace(/[^a-zA-Z\s]/g,'').trim().replace(/\s+/g,' ');
@@ -875,14 +839,8 @@ userName=getUserName();
 updateBranding();
 updateIdleHint();
 
-function applyFaceState(){
-  if(!orbFace) return;
-  const state=faceOverride||window.aiState||'idle';
-  orbFace.className=state;
-}
-function setFaceOverride(state){
-  faceOverride=state||'';
-  applyFaceState();
+function setOrbExpression(state){
+  window.orbExpression=state||'';
 }
 
 function setAIState(s){
@@ -890,16 +848,14 @@ function setAIState(s){
   const lbl=document.getElementById('state-label');
   document.getElementById('state-text').textContent=s==='thinking'?'Thinking…':s==='speaking'?'Speaking':'Idle';
   lbl.className=s==='idle'?'':s;
-  applyFaceState();
 }
-applyFaceState();
 
 function showAnswer(text,source){
   const oneLineAnswer=formatSingleLineAnswer(text);
   lastAnswer=oneLineAnswer;
   const card=document.getElementById('orb-answer');
   const el=document.getElementById('answer-text');
-  setFaceOverride('answering');
+  setOrbExpression('answering');
   document.getElementById('src-tag').textContent=source==='ai'
     ? 'Model: '+MODEL_NAME+' (Groq)'
     : source==='wikipedia'
@@ -917,7 +873,7 @@ function showAnswer(text,source){
 function hideAnswer(){
   document.getElementById('orb-answer').classList.remove('visible');
   document.getElementById('idle-hint').style.opacity='1';
-  setFaceOverride('');
+  setOrbExpression('');
   updateIdleHint();
 }
 
@@ -933,14 +889,14 @@ function doSpeak(text){
   const u=new SpeechSynthesisUtterance(text);
   u.lang=currentLang==='hi'?'hi-IN':'en-IN';
   u.rate=.92;u.pitch=1;
-  u.onstart=()=>{setFaceOverride('');beginSpeechSync(text);speakBtn.classList.add('on');setAIState('speaking')};
+  u.onstart=()=>{setOrbExpression('');beginSpeechSync(text);speakBtn.classList.add('on');setAIState('speaking')};
   u.onboundary=e=>{if(typeof e.charIndex==='number') updateSpeechSync(e.charIndex);};
-  u.onend=()=>{setFaceOverride('');endSpeechSync();speakBtn.classList.remove('on');setAIState('idle')};
-  u.onerror=()=>{setFaceOverride('');endSpeechSync();speakBtn.classList.remove('on');setAIState('idle')};
+  u.onend=()=>{setOrbExpression('');endSpeechSync();speakBtn.classList.remove('on');setAIState('idle')};
+  u.onerror=()=>{setOrbExpression('');endSpeechSync();speakBtn.classList.remove('on');setAIState('idle')};
   speechSynthesis.speak(u);
 }
 function toggleSpeak(){
-  if(speechSynthesis.speaking){speechSynthesis.cancel();setFaceOverride('');endSpeechSync();speakBtn.classList.remove('on');setAIState('idle');}
+  if(speechSynthesis.speaking){speechSynthesis.cancel();setOrbExpression('');endSpeechSync();speakBtn.classList.remove('on');setAIState('idle');}
   else if(lastAnswer){doSpeak(lastAnswer);}
 }
 
@@ -987,7 +943,7 @@ async function ask(){
   if(!question) return inp.focus();
   inp.value='';
   speechSynthesis.cancel();
-  setFaceOverride('');
+  setOrbExpression('');
   speakBtn.classList.remove('on');
   setAIState('thinking');
   hideAnswer();
