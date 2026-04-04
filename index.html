@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-<title>Health-Teach</title>
+<title>Health - Teach</title>
 <script>
 (()=>{try{
-  const key='healthq-theme';
+  const key='health-teach-theme';
   const saved=localStorage.getItem(key);
   const theme=saved||(window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');
   document.documentElement.setAttribute('data-theme',theme);
@@ -405,7 +405,7 @@ html[data-theme='light'] #cursor{box-shadow:0 0 8px rgba(255,170,60,.75)}
   <div class="mist"></div>
 </div>
 
-<div id="wordmark">HEALTH-TEACH</div>
+<div id="wordmark">Health - Teach</div>
 <button id="themeBtn" type="button">Switch to Day</button>
 
 <div id="state-label">
@@ -428,7 +428,7 @@ html[data-theme='light'] #cursor{box-shadow:0 0 8px rgba(255,170,60,.75)}
   </div>
 </div>
 
-<div id="page-footer">Powered by Team - Elevate</div>
+<div id="page-footer">Team - elevate</div>
 
 <div id="input-wrap">
   <div class="ig">
@@ -525,7 +525,7 @@ window.aiState='idle';
     cloudTarget=isLight?1:0;
   }
   applySceneTheme(root.getAttribute('data-theme')==='light'?'light':'dark');
-  window.addEventListener('healthq-theme-change',e=>applySceneTheme(e.detail.theme));
+  window.addEventListener('health-teach-theme-change',e=>applySceneTheme(e.detail.theme));
 
   const NRINGS=10,wR=[];
   for(let i=0;i<NRINGS;i++){
@@ -623,7 +623,7 @@ window.aiState='idle';
 
 <!-- ═══ APP LOGIC ═══ -->
 <script>
-const THEME_KEY='healthq-theme';
+const THEME_KEY='health-teach-theme';
 const themeBtn=document.getElementById('themeBtn');
 const rootStyle=document.documentElement;
 
@@ -647,7 +647,7 @@ function applyTheme(theme){
   document.documentElement.setAttribute('data-theme',theme);
   try{localStorage.setItem(THEME_KEY,theme);}catch(_){}
   if(themeBtn) themeBtn.textContent=theme==='light'?'Switch to Night':'Switch to Day';
-  window.dispatchEvent(new CustomEvent('healthq-theme-change',{detail:{theme}}));
+  window.dispatchEvent(new CustomEvent('health-teach-theme-change',{detail:{theme}}));
 }
 applyTheme(document.documentElement.getAttribute('data-theme')||'dark');
 if(themeBtn){
@@ -671,7 +671,7 @@ if(!isTouch){
 
 const API='';
 const MODEL_NAME='Elevate';
-const USER_NAME_KEY='healthq-user-name';
+const USER_NAME_KEY='health-teach-user-name';
 let currentLang='en', lastAnswer='', userName='Friend';
 
 function cleanName(raw){
@@ -694,9 +694,9 @@ function updateBranding(){
   const mark=document.getElementById('wordmark');
   const tag=document.getElementById('src-tag');
   const footer=document.getElementById('page-footer');
-  if(mark) mark.textContent='HEALTHQ';
+  if(mark) mark.textContent='Health - Teach';
   if(tag) tag.textContent='Model: '+MODEL_NAME;
-  if(footer) footer.textContent='Powered by '+MODEL_NAME;
+  if(footer) footer.textContent='Team - elevate';
 }
 
 function updateIdleHint(){
@@ -797,7 +797,7 @@ function showAnswer(text,source){
     ? 'Model: '+MODEL_NAME+' (Groq)'
     : source==='wikipedia'
       ? 'Wikipedia + '+MODEL_NAME
-      : 'HealthQ - Local Data';
+      : 'Health - Teach - Local Data';
   document.getElementById('idle-hint').style.opacity='0';
   card.classList.remove('visible');
   el.textContent='';
