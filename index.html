@@ -106,22 +106,15 @@ html[data-theme='light'] #day-scenery{opacity:1}
   border-radius:50%;
   background:radial-gradient(circle,rgba(255,233,141,.95) 0%,rgba(255,218,110,.52) 35%,rgba(255,200,70,0) 75%);
 }
-#day-scenery .horizon{
-  position:absolute;
-  left:0;
-  right:0;
-  bottom:0;
-  height:36vh;
-  min-height:150px;
-  background:linear-gradient(180deg,rgba(170,223,255,.08) 0%,rgba(132,205,255,.45) 42%,rgba(130,201,148,.56) 100%);
-}
 #day-scenery .mist{
   position:absolute;
   left:0;
   right:0;
-  bottom:13vh;
-  height:10vh;
-  background:linear-gradient(180deg,rgba(255,255,255,.42),rgba(255,255,255,0));
+  bottom:0;
+  height:18vh;
+  background:
+    radial-gradient(circle at 50% 40%,rgba(255,255,255,.36),rgba(255,255,255,0) 68%),
+    linear-gradient(180deg,rgba(255,255,255,.26),rgba(255,255,255,0));
 }
 
 /* Wordmark */
@@ -371,7 +364,6 @@ html[data-theme='light'] #cursor{box-shadow:0 0 8px rgba(255,170,60,.75)}
   #hint{font-size:10px}
   #page-footer{font-size:9px;letter-spacing:.35px;max-width:calc(100vw - 8px)}
   #day-scenery .sun-glow{width:44vmin;height:44vmin;right:2vmin}
-  #day-scenery .horizon{height:30vh;min-height:120px}
 }
 
 @media (max-width:390px){
@@ -389,7 +381,6 @@ html[data-theme='light'] #cursor{box-shadow:0 0 8px rgba(255,170,60,.75)}
   #answer-text{font-size:13px}
   #input-wrap{bottom:calc(max(24px,calc(var(--safe-bottom) + 18px)) + var(--kb-offset))}
   #page-footer{font-size:8px;opacity:.86}
-  #day-scenery .horizon{height:24vh}
 }
 
 @media (max-width:320px){
@@ -409,7 +400,6 @@ html[data-theme='light'] #cursor{box-shadow:0 0 8px rgba(255,170,60,.75)}
 <canvas id="bg"></canvas>
 <div id="day-scenery" aria-hidden="true">
   <div class="sun-glow"></div>
-  <div class="horizon"></div>
   <div class="mist"></div>
 </div>
 
@@ -554,23 +544,23 @@ window.aiState='idle';
 
   const cloudGroup=new THREE.Group();
   const cloudMats=[];
-  for(let i=0;i<14;i++){
+  for(let i=0;i<24;i++){
     const cluster=new THREE.Group();
-    const puffCount=6+Math.floor(Math.random()*4);
+    const puffCount=9+Math.floor(Math.random()*5);
     for(let j=0;j<puffCount;j++){
       const mat=new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0,depthWrite:false});
-      mat.userData.baseOpacity=.24+Math.random()*.2;
+      mat.userData.baseOpacity=.32+Math.random()*.24;
       const puff=new THREE.Mesh(new THREE.SphereGeometry(1,18,18),mat);
-      puff.position.set((Math.random()-.5)*4.6,(Math.random()-.5)*1.7,(Math.random()-.5)*2.2);
-      puff.scale.set(3.1+Math.random()*2.8,1.2+Math.random()*1.1,1.6+Math.random()*1.9);
+      puff.position.set((Math.random()-.5)*5.8,(Math.random()-.5)*2.1,(Math.random()-.5)*2.8);
+      puff.scale.set(3.9+Math.random()*3.6,1.45+Math.random()*1.25,2.1+Math.random()*2.2);
       cluster.add(puff);
       cloudMats.push(mat);
     }
-    const ax=(Math.random()-.5)*56;
-    const ay=4+Math.random()*24;
-    const az=-12+Math.random()*18;
+    const ax=(Math.random()-.5)*54;
+    const ay=2+Math.random()*22;
+    const az=-10+Math.random()*16;
     cluster.position.set(ax,ay,az);
-    cluster.userData={ax,ay,az,phase:Math.random()*Math.PI*2,speed:.09+Math.random()*.11};
+    cluster.userData={ax,ay,az,phase:Math.random()*Math.PI*2,speed:.06+Math.random()*.08};
     cloudGroup.add(cluster);
   }
   scene.add(cloudGroup);
